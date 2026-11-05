@@ -83,8 +83,8 @@ Panel {
     : strings.t("panel.reset", "Reset")
   readonly property string secondaryIcon: root.breakPhase ? "\u{f04ad}" : "\u{f0709}"
   readonly property string keysHint: root.breakPhase
-    ? strings.t("panel.keysBreak", "Space start/pause · R skip break · 1/2 mode")
-    : strings.t("panel.keys", "Space start/pause · R reset · 1/2 mode")
+    ? strings.t("panel.keysBreak", "Space toggle · R skip · 1/2 mode")
+    : strings.t("panel.keys", "Space toggle · R reset · 1/2 mode")
   readonly property real progress: service ? service.progress : 0
   readonly property int sessions: service ? service.sessionsToday : 0
   readonly property var modeOptions: [

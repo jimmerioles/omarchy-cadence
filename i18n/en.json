@@ -28,8 +28,8 @@
     "one": "%1 session today",
     "other": "%1 sessions today"
   },
-  "panel.keys": "Space start/pause · R reset · 1/2 mode",
-  "panel.keysBreak": "Space start/pause · R skip break · 1/2 mode",
+  "panel.keys": "Space toggle · R reset · 1/2 mode",
+  "panel.keysBreak": "Space toggle · R skip · 1/2 mode",
   "panel.loading": "Loading",
   "panel.unavailable": "Focus service is still loading.",
   "notify.deepDone": "Deep work complete",

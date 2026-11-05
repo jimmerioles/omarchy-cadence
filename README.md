@@ -37,6 +37,12 @@ omarchy bar move jimmerioles.focus --section right --before omarchy.agents
 
 Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
 
+Update the plugin later with:
+
+```bash
+omarchy plugin update jimmerioles.focus
+```
+
 ## Usage
 
 - **Left click** the bar widget: open the timer panel.

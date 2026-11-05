@@ -35,7 +35,11 @@ Item {
   property bool notifications: true
 
   // ---- Session ----------------------------------------------------------
+  // mode is the work type chosen for the next session; sessionMode is the
+  // type the current work block or break belongs to. They differ while a
+  // session is running if the user has already picked what comes next.
   property string mode: "deep"          // "deep" | "pomodoro"
+  property string sessionMode: "deep"   // "deep" | "pomodoro"
   property string phase: "work"         // "work" | "break"
   property bool running: false
   property double endsAt: 0             // epoch ms; only meaningful while running
@@ -54,13 +58,13 @@ Item {
   readonly property real progress: totalMs > 0
     ? Util.clamp(1 - effectiveRemainingMs / totalMs, 0, 1)
     : 0
-  readonly property int workMinutes: mode === "deep" ? deepMinutes : pomodoroMinutes
-  readonly property int breakMinutes: mode === "deep" ? deepBreakMinutes : shortBreakMinutes
+  readonly property int workMinutes: sessionMode === "deep" ? deepMinutes : pomodoroMinutes
+  readonly property int breakMinutes: sessionMode === "deep" ? deepBreakMinutes : shortBreakMinutes
   readonly property bool paused: !running && effectiveRemainingMs < totalMs - 500
 
   readonly property string phaseLabel: phase === "break"
     ? strings.t("panel.break", "Break")
-    : (mode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.pomodoro", "Pomodoro"))
+    : (sessionMode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.pomodoro", "Pomodoro"))
   readonly property string statusLabel: running
     ? strings.t("panel.running", "Running")
     : (paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))
@@ -105,6 +109,7 @@ Item {
     // A session that has not started yet follows its new length. A running or
     // paused session keeps the length it began with.
     if (stateLoaded && !running && !paused) {
+      if (phase === "work") sessionMode = mode
       totalMs = durationFor(phase)
       remainingMs = totalMs
       dirty = true
@@ -121,6 +126,15 @@ Item {
   function start() {
     if (running) return
     ensureToday()
+
+    // Starting a fresh work block adopts the queued mode. Resuming a paused
+    // session keeps the mode it was already using.
+    if (phase === "work" && !paused) {
+      sessionMode = mode
+      totalMs = durationFor("work")
+      remainingMs = totalMs
+    }
+
     if (totalMs <= 0 || remainingMs <= 0 || remainingMs > totalMs + 1000) {
       totalMs = durationFor(phase)
       remainingMs = totalMs
@@ -160,6 +174,7 @@ Item {
     running = false
     endsAt = 0
     nowMs = Date.now()
+    if (phase === "work") sessionMode = mode
     totalMs = durationFor(phase)
     remainingMs = totalMs
     dirty = true
@@ -168,16 +183,26 @@ Item {
 
   function selectMode(next) {
     if (next !== "deep" && next !== "pomodoro") return
-    if (next === mode && phase === "work" && !running && !paused) return
+
+    // While a session is running, paused, or on a break, a new mode is queued
+    // for the next work block instead of throwing the current one away.
+    if (next === mode) {
+      if (phase === "work" && !running && !paused && sessionMode !== mode) {
+        sessionMode = mode
+        totalMs = durationFor("work")
+        remainingMs = totalMs
+        dirty = true
+        saveSoon()
+      }
+      return
+    }
 
     mode = next
-    phase = "work"
-    running = false
-    endsAt = 0
-    nowMs = Date.now()
-    ensureToday()
-    totalMs = durationFor("work")
-    remainingMs = totalMs
+    if (phase === "work" && !running && !paused) {
+      sessionMode = mode
+      totalMs = durationFor("work")
+      remainingMs = totalMs
+    }
     dirty = true
     saveSoon()
   }
@@ -205,6 +230,7 @@ Item {
       if (autoStartBreak) start()
     } else {
       phase = "work"
+      sessionMode = mode
       totalMs = durationFor("work")
       remainingMs = totalMs
       notifyBreakDone()
@@ -224,6 +250,7 @@ Item {
       phase = "break"
     } else {
       phase = "work"
+      sessionMode = mode
     }
     running = false
     endsAt = 0
@@ -244,13 +271,18 @@ Item {
   function notifyWorkDone() {
     if (!notifications) return
     var minutes = Commons.I18n.formatNumber(breakMinutes, 0)
-    var title = mode === "deep"
+    var title = sessionMode === "deep"
       ? strings.t("notify.deepDone", "Deep work complete")
       : strings.t("notify.pomodoroDone", "Pomodoro complete")
     var body = autoStartBreak
       ? strings.t("notify.breakStarted", "A %1 minute break has started. Step away.").arg(minutes)
       : strings.t("notify.breakReady", "A %1 minute break is ready. Start it when you are.").arg(minutes)
-    sendNotification(title, body, "\u{f051b}")
+    var extraAction = []
+    if (!autoStartBreak) {
+      extraAction = ["--action", strings.t("notify.startBreak", "Start break"),
+                     "omarchy-shell", "jimmerioles.focus", "start"]
+    }
+    sendNotification(title, body, "\u{f051b}", extraAction)
   }
 
   function notifyBreakDone() {
@@ -258,17 +290,26 @@ Item {
     var body = autoStartWork
       ? strings.t("notify.nextStarted", "The next session has started.")
       : strings.t("notify.ready", "Ready for the next session.")
-    sendNotification(strings.t("notify.breakDone", "Break complete"), body, "\u{f0176}")
+    var extraAction = []
+    if (!autoStartWork) {
+      extraAction = ["--action", strings.t("notify.startWork", "Start focus"),
+                     "omarchy-shell", "jimmerioles.focus", "start"]
+    }
+    sendNotification(strings.t("notify.breakDone", "Break complete"), body, "\u{f0176}", extraAction)
   }
 
-  function sendNotification(title, body, glyph) {
-    Util.execArgv([
+  function sendNotification(title, body, glyph, extraAction) {
+    var argv = [
       "omarchy-notification-send",
       String(title), String(body),
       "-g", glyph,
       "-u", "normal",
-      "--app-name", "Focus"
-    ])
+      "--app-name", "Focus",
+      "--action", strings.t("notify.open", "Open Focus"),
+      "omarchy-shell", "jimmerioles.focus", "open"
+    ]
+    if (extraAction && extraAction.length > 0) argv = argv.concat(extraAction)
+    Util.execArgv(argv)
   }
 
   // ---- Persistence ------------------------------------------------------
@@ -277,6 +318,7 @@ Item {
     endsAt = 0
     nowMs = Date.now()
     phase = "work"
+    sessionMode = mode
     totalMs = durationFor("work")
     remainingMs = totalMs
     ensureToday()
@@ -301,6 +343,7 @@ Item {
     }
 
     mode = parsed.mode
+    sessionMode = parsed.sessionMode
     phase = parsed.phase
     sessionsToday = parsed.sessionsToday
     sessionsDate = parsed.sessionsDate
@@ -328,10 +371,12 @@ Item {
       // Previously idle or ready to begin: adopt the current configured
       // durations, which may have changed since the state was written.
       if (remainingMs >= totalMs - 500) {
+        if (phase === "work") sessionMode = mode
         totalMs = durationFor(phase)
         remainingMs = totalMs
       }
       if (remainingMs <= 0) {
+        if (phase === "work") sessionMode = mode
         totalMs = durationFor(phase)
         remainingMs = totalMs
       }
@@ -353,6 +398,7 @@ Item {
     stateFile.setText(JSON.stringify({
       version: 1,
       mode: mode,
+      sessionMode: sessionMode,
       phase: phase,
       running: running,
       endsAt: running ? Math.round(endsAt) : 0,
@@ -367,6 +413,7 @@ Item {
   function status() {
     return JSON.stringify({
       mode: mode,
+      sessionMode: sessionMode,
       phase: phase,
       running: running,
       paused: paused,

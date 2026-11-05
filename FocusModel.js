@@ -49,8 +49,14 @@ function parseState(raw) {
   }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null
 
+  var mode = parsed.mode === "pomodoro" ? "pomodoro" : "deep"
+  var sessionMode = parsed.sessionMode === "pomodoro"
+    ? "pomodoro"
+    : (parsed.sessionMode === "deep" ? "deep" : mode)
+
   return {
-    mode: parsed.mode === "pomodoro" ? "pomodoro" : "deep",
+    mode: mode,
+    sessionMode: sessionMode,
     phase: parsed.phase === "break" ? "break" : "work",
     running: parsed.running === true,
     endsAt: clampNumber(parsed.endsAt, 0, 0, 8640000000000000),

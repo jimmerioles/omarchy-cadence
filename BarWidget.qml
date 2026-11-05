@@ -18,22 +18,25 @@ BarWidget {
   }
 
   readonly property bool breakPhase: service ? service.phase === "break" : false
-  readonly property string glyph: breakPhase ? "\u{f0176}" : "\u{f051b}"
-  readonly property bool hasStarted: service
-    ? service.running || service.effectiveRemainingMs < service.totalMs - 500
-    : false
+  readonly property string glyph: service && service.paused
+    ? "\u{f03e4}"
+    : (breakPhase ? "\u{f0176}" : "\u{f051b}")
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
+  // The time stays on the bar in every state, so starting or pausing does not
+  // change the widget's width and shift its neighbors.
   readonly property string barText: root.vertical
     ? root.glyph
-    : (root.hasStarted ? root.glyph + "  " + root.timeText : root.glyph)
+    : root.glyph + "  " + root.timeText
   readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Focus")
   readonly property string tooltipText: {
     if (!service) return strings.t("widget.tooltip", "Focus timer")
-    if (service.running) return root.phaseLabel + " · " + root.timeText
-    if (service.paused) return root.phaseLabel + " · " + strings.t("panel.paused", "Paused")
-    return root.phaseLabel + " · " + strings.t("panel.ready", "Ready")
+    var firstLine = root.vertical
+      ? root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
+      : root.phaseLabel + " · " + service.statusLabel
+    return firstLine + "\n"
+      + strings.t("widget.hint", "Right-click start/pause · Middle-click reset")
   }
   readonly property bool active: service ? service.running : false
 

@@ -13,9 +13,11 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 
 ## Features
 
-- Countdown in the bar while a session is running; the icon changes for breaks.
+- The session length stays visible in the bar in every state, so starting or pausing does not shift neighboring widgets.
 - Panel with session type, progress, start/pause, and reset.
+- Choosing a session type while a timer is running queues it for the next focus block without interrupting the current one.
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
+- Notifications can open the panel, and start a ready break or focus block.
 - Completed sessions counted for the day.
 - Keyboard controls in the panel: `Space` start/pause, `R` reset, `1` deep work, `2` Pomodoro, `Escape` close.
 - Localized strings and theme-aware colors, borders, and spacing.
@@ -40,6 +42,8 @@ Plugins run as unsandboxed code inside the shell process. Only install plugins w
 - **Right click**: start or pause.
 - **Middle click**: reset the current session.
 
+While a session is running, picking a session type queues it for the next focus block; the current timer keeps its original length and break. Reset applies the queued type immediately.
+
 The panel also exposes its controls over IPC:
 
 ```bash
@@ -55,6 +59,8 @@ omarchy-shell jimmerioles.focus close
 ```
 
 `status` returns JSON with the current mode, phase, remaining milliseconds, progress, and today's completed session count.
+
+Notifications can be clicked to open the panel. When a break or work block is ready rather than auto-started, the notification also offers a button to start it.
 
 ## Settings
 

@@ -35,20 +35,27 @@ Panel {
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
-  readonly property string glyph: service && service.phase === "break"
+  readonly property bool breakPhase: service ? service.phase === "break" : false
+  readonly property bool choosingNext: service
+    ? (service.phase === "break" || service.running || service.paused)
+    : false
+  readonly property string sessionTypeLabel: root.choosingNext
+    ? strings.t("panel.nextSession", "Next session")
+    : strings.t("panel.sessionType", "Session type")
+  readonly property string glyph: root.breakPhase
     ? "\u{f0176}"
     : "\u{f051b}"
   readonly property string phaseLabel: !service
     ? strings.t("widget.name", "Focus")
     : service.phase === "break"
       ? strings.t("panel.break", "Break")
-      : (service.mode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.pomodoro", "Pomodoro"))
+      : (service.sessionMode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.pomodoro", "Pomodoro"))
   readonly property string phaseMeta: {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
     if (service.phase === "break")
       return strings.t("panel.breakMeta", "Step away and reset for %1 minutes").arg(minutes)
-    return (service.mode === "deep"
+    return (service.sessionMode === "deep"
       ? strings.t("panel.deepMeta", "%1 minute ultradian focus block")
       : strings.t("panel.pomodoroMeta", "%1 minute pomodoro focus block")).arg(minutes)
   }
@@ -61,7 +68,13 @@ Panel {
     ? strings.t("panel.start", "Start")
     : service.running
       ? strings.t("panel.pause", "Pause")
-      : (service.paused ? strings.t("panel.resume", "Resume") : strings.t("panel.start", "Start"))
+      : service.paused
+        ? strings.t("panel.resume", "Resume")
+        : root.breakPhase
+          ? strings.t("panel.startBreak", "Start break")
+          : (service.sessionMode === "deep"
+            ? strings.t("panel.startDeep", "Start deep work")
+            : strings.t("panel.startPomodoro", "Start Pomodoro"))
   readonly property real progress: service ? service.progress : 0
   readonly property int sessions: service ? service.sessionsToday : 0
   readonly property var modeOptions: [
@@ -139,7 +152,7 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             text: root.glyph
             textFormat: Text.PlainText
-            color: root.contentForeground
+            color: root.breakPhase ? Commons.Color.accent : root.contentForeground
             font.family: root.contentFontFamily
             font.pixelSize: Style.font.display
           }
@@ -186,7 +199,7 @@ Panel {
               ? Util.alpha(Commons.Color.accent, 0.14)
               : "transparent"
             borderSpec: Border.controlSpec(
-              root.service && root.service.running ? "selected" : "normal",
+              root.service && (root.service.running || root.breakPhase) ? "selected" : "normal",
               root.contentForeground,
               Commons.Color.accent)
 
@@ -195,7 +208,9 @@ Panel {
               anchors.centerIn: parent
               text: root.statusLabel
               textFormat: Text.PlainText
-              color: root.service && root.service.running ? Commons.Color.accent : root.dim
+              color: root.service && (root.service.running || root.breakPhase)
+                ? Commons.Color.accent
+                : root.dim
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.caption
               font.bold: true
@@ -208,7 +223,7 @@ Panel {
           width: parent.width
           text: root.timeText
           textFormat: Text.PlainText
-          color: root.contentForeground
+          color: root.breakPhase ? Commons.Color.accent : root.contentForeground
           font.family: root.contentFontFamily
           font.pixelSize: Math.round(Style.font.displayLarge * 1.65)
           font.bold: true
@@ -239,10 +254,10 @@ Panel {
           }
         }
 
-        // ---- Session type. Chips are inert while running so a stray click
-        //      cannot throw away an in-progress session.
+        // ---- Session type. While a session is active the chips choose the
+        //      type for the next work block instead of interrupting this one.
         PanelSectionHeader {
-          text: strings.t("panel.sessionType", "Session type")
+          text: root.sessionTypeLabel
           foreground: root.contentForeground
           fontFamily: root.contentFontFamily
         }
@@ -250,7 +265,6 @@ Panel {
         Item {
           width: parent.width
           height: modeGroup.implicitHeight
-          opacity: root.service && root.service.running ? 0.45 : 1
 
           ButtonGroup {
             id: modeGroup
@@ -264,12 +278,17 @@ Panel {
             focusable: false
             onChanged: function(value) { root.selectMode(value) }
           }
+        }
 
-          MouseArea {
-            anchors.fill: parent
-            enabled: root.service && root.service.running
-            acceptedButtons: Qt.AllButtons
-          }
+        Text {
+          visible: root.choosingNext
+          width: parent.width
+          text: strings.t("panel.nextHint", "Applies to the next focus session.")
+          textFormat: Text.PlainText
+          color: root.dim
+          font.family: root.contentFontFamily
+          font.pixelSize: Style.font.caption
+          wrapMode: Text.Wrap
         }
 
         // ---- Transport.

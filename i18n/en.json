@@ -1,6 +1,7 @@
 {
   "widget.name": "Focus",
   "widget.tooltip": "Focus timer",
+  "widget.hint": "Right-click start/pause · Middle-click reset",
   "panel.deep": "Deep work",
   "panel.pomodoro": "Pomodoro",
   "panel.break": "Break",
@@ -11,17 +12,22 @@
   "panel.running": "Running",
   "panel.paused": "Paused",
   "panel.start": "Start",
+  "panel.startDeep": "Start deep work",
+  "panel.startPomodoro": "Start Pomodoro",
+  "panel.startBreak": "Start break",
   "panel.pause": "Pause",
   "panel.resume": "Resume",
   "panel.reset": "Reset",
   "panel.sessionType": "Session type",
+  "panel.nextSession": "Next session",
+  "panel.nextHint": "Applies to the next focus session.",
   "panel.deepChip": "Deep work · %1 min",
   "panel.pomodoroChip": "Pomodoro · %1 min",
   "panel.sessions": {
     "one": "%1 session today",
     "other": "%1 sessions today"
   },
-  "panel.keys": "Space start/pause · R reset · 1/2 type",
+  "panel.keys": "Space start/pause · R reset · 1/2 mode",
   "panel.loading": "Loading",
   "panel.unavailable": "Focus service is still loading.",
   "notify.deepDone": "Deep work complete",
@@ -30,5 +36,8 @@
   "notify.breakReady": "A %1 minute break is ready. Start it when you are.",
   "notify.breakDone": "Break complete",
   "notify.ready": "Ready for the next session.",
-  "notify.nextStarted": "The next session has started."
+  "notify.nextStarted": "The next session has started.",
+  "notify.open": "Open Focus",
+  "notify.startBreak": "Start break",
+  "notify.startWork": "Start focus"
 }

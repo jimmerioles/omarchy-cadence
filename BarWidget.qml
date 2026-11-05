@@ -130,6 +130,7 @@ BarWidget {
     function start(): void { if (root.service) root.service.start() }
     function pause(): void { if (root.service) root.service.pause() }
     function reset(): void { if (root.service) root.service.reset() }
+    function skipBreak(): void { if (root.service) root.service.skipBreak() }
     function toggleTimer(): void { if (root.service) root.service.toggle() }
     function setMode(value: string): string { if (root.service) root.service.selectMode(String(value)); return root.service ? root.service.mode : "" }
     function status(): string { return root.service ? root.service.status() : "{}" }

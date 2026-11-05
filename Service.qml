@@ -181,6 +181,19 @@ Item {
     saveSoon()
   }
 
+  function skipBreak() {
+    if (phase !== "break") return
+    running = false
+    endsAt = 0
+    nowMs = Date.now()
+    phase = "work"
+    sessionMode = mode
+    totalMs = durationFor("work")
+    remainingMs = totalMs
+    dirty = true
+    saveSoon()
+  }
+
   function selectMode(next) {
     if (next !== "deep" && next !== "pomodoro") return
 

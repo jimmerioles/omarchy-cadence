@@ -18,6 +18,7 @@
   "panel.pause": "Pause",
   "panel.resume": "Resume",
   "panel.reset": "Reset",
+  "panel.skipBreak": "Skip break",
   "panel.sessionType": "Session type",
   "panel.nextSession": "Next session",
   "panel.nextHint": "Applies to the next focus session.",
@@ -28,6 +29,7 @@
     "other": "%1 sessions today"
   },
   "panel.keys": "Space start/pause · R reset · 1/2 mode",
+  "panel.keysBreak": "Space start/pause · R skip break · 1/2 mode",
   "panel.loading": "Loading",
   "panel.unavailable": "Focus service is still loading.",
   "notify.deepDone": "Deep work complete",

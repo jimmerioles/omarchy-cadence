@@ -42,6 +42,9 @@ Panel {
   readonly property string sessionTypeLabel: root.choosingNext
     ? strings.t("panel.nextSession", "Next session")
     : strings.t("panel.sessionType", "Session type")
+  readonly property bool queuedModeDiffers: service
+    ? service.mode !== service.sessionMode
+    : false
   readonly property string glyph: root.breakPhase
     ? "\u{f0176}"
     : "\u{f051b}"
@@ -75,6 +78,13 @@ Panel {
           : (service.sessionMode === "deep"
             ? strings.t("panel.startDeep", "Start deep work")
             : strings.t("panel.startPomodoro", "Start Pomodoro"))
+  readonly property string secondaryLabel: root.breakPhase
+    ? strings.t("panel.skipBreak", "Skip break")
+    : strings.t("panel.reset", "Reset")
+  readonly property string secondaryIcon: root.breakPhase ? "\u{f04ad}" : "\u{f0709}"
+  readonly property string keysHint: root.breakPhase
+    ? strings.t("panel.keysBreak", "Space start/pause · R skip break · 1/2 mode")
+    : strings.t("panel.keys", "Space start/pause · R reset · 1/2 mode")
   readonly property real progress: service ? service.progress : 0
   readonly property int sessions: service ? service.sessionsToday : 0
   readonly property var modeOptions: [
@@ -92,8 +102,10 @@ Panel {
     if (service) service.toggle()
   }
 
-  function resetTimer() {
-    if (service) service.reset()
+  function secondaryAction() {
+    if (!service) return
+    if (root.breakPhase) service.skipBreak()
+    else service.reset()
   }
 
   function selectMode(value) {
@@ -120,7 +132,7 @@ Panel {
       onCloseRequested: root.close()
       onTabRequested: function(direction) { root.switchPanel(direction) }
       onTextKey: function(text, modifiers) {
-        if (text === "r" || text === "R") root.resetTimer()
+        if (text === "r" || text === "R") root.secondaryAction()
         else if (text === "1") root.selectMode("deep")
         else if (text === "2") root.selectMode("pomodoro")
       }
@@ -281,7 +293,7 @@ Panel {
         }
 
         Text {
-          visible: root.choosingNext
+          visible: root.queuedModeDiffers
           width: parent.width
           text: strings.t("panel.nextHint", "Applies to the next focus session.")
           textFormat: Text.PlainText
@@ -311,13 +323,13 @@ Panel {
 
           Button {
             width: parent.width - primaryButton.width - parent.spacing
-            text: strings.t("panel.reset", "Reset")
-            iconText: "\u{f0709}"
+            text: root.secondaryLabel
+            iconText: root.secondaryIcon
             bordered: true
             foreground: root.contentForeground
             accent: Commons.Color.accent
             fontFamily: root.contentFontFamily
-            onClicked: root.resetTimer()
+            onClicked: root.secondaryAction()
           }
         }
 
@@ -343,7 +355,7 @@ Panel {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             width: Math.min(implicitWidth, Math.max(0, parent.width - sessionsText.width - Style.space(8)))
-            text: strings.t("panel.keys", "Space start/pause · R reset · 1/2 type")
+            text: root.keysHint
             textFormat: Text.PlainText
             color: root.dim
             font.family: root.contentFontFamily

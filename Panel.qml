@@ -58,10 +58,10 @@ Panel {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
     if (root.breakPhase)
-      return strings.t("panel.breakMeta", "Step away and reset for %1 minutes").arg(minutes)
+      return strings.t("panel.breakMeta", "%1 minute break").arg(minutes)
     return (service.sessionMode === "deep"
-      ? strings.t("panel.deepMeta", "%1 minute ultradian focus block")
-      : strings.t("panel.pomodoroMeta", "%1 minute pomodoro focus block")).arg(minutes)
+      ? strings.t("panel.deepMeta", "%1 minute ultradian block")
+      : strings.t("panel.pomodoroMeta", "%1 minute pomodoro block")).arg(minutes)
   }
   readonly property string statusLabel: !service
     ? strings.t("panel.loading", "Loading")

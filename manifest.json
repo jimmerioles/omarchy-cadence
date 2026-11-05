@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "id": "jimmerioles.focus",
+  "name": "Focus",
+  "version": "1.0.0",
+  "author": "Jim Merioles",
+  "license": "MIT",
+  "description": "Pomodoro and ultradian focus timer with work and break sessions in the Omarchy bar.",
+  "kinds": [
+    "bar-widget",
+    "service"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "service": "Service.qml"
+  },
+  "barWidget": {
+    "displayName": "Focus",
+    "description": "Deep work and Pomodoro sessions with breaks and desktop notifications.",
+    "category": "Time",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "deepMinutes": 90,
+      "pomodoroMinutes": 25,
+      "deepBreakMinutes": 20,
+      "shortBreakMinutes": 5,
+      "autoStartBreak": true,
+      "autoStartWork": false,
+      "notifications": true
+    },
+    "schema": [
+      {
+        "key": "deepMinutes",
+        "type": "integer",
+        "label": "Deep work length (minutes)",
+        "min": 15,
+        "max": 180,
+        "step": 5,
+        "defaultValue": 90,
+        "description": "Ultradian focus block. The standard is 90 minutes."
+      },
+      {
+        "key": "pomodoroMinutes",
+        "type": "integer",
+        "label": "Pomodoro length (minutes)",
+        "min": 5,
+        "max": 60,
+        "step": 5,
+        "defaultValue": 25,
+        "description": "Short focus block for smaller tasks."
+      },
+      {
+        "key": "deepBreakMinutes",
+        "type": "integer",
+        "label": "Deep work break (minutes)",
+        "min": 5,
+        "max": 45,
+        "step": 5,
+        "defaultValue": 20,
+        "description": "Recovery after a deep work block."
+      },
+      {
+        "key": "shortBreakMinutes",
+        "type": "integer",
+        "label": "Pomodoro break (minutes)",
+        "min": 1,
+        "max": 15,
+        "step": 1,
+        "defaultValue": 5,
+        "description": "Short recovery after a Pomodoro."
+      },
+      {
+        "key": "autoStartBreak",
+        "type": "boolean",
+        "label": "Start breaks automatically",
+        "defaultValue": true,
+        "description": "Begin the break countdown as soon as a work session ends."
+      },
+      {
+        "key": "autoStartWork",
+        "type": "boolean",
+        "label": "Start work automatically",
+        "defaultValue": false,
+        "description": "Begin the next work session as soon as a break ends."
+      },
+      {
+        "key": "notifications",
+        "type": "boolean",
+        "label": "Desktop notifications",
+        "defaultValue": true,
+        "description": "Notify when a work or break session ends."
+      }
+    ]
+  }
+}

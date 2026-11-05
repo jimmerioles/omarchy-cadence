@@ -27,11 +27,9 @@ BarWidget {
   readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Focus")
   readonly property string tooltipText: {
     if (!service) return strings.t("widget.tooltip", "Focus timer")
-    var firstLine = root.vertical
-      ? root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
-      : root.phaseLabel + " · " + service.statusLabel
-    return firstLine + "\n"
-      + strings.t("widget.hint", "Right-click start/pause · Middle-click reset")
+    if (root.vertical)
+      return root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
+    return root.phaseLabel + " · " + service.statusLabel
   }
   readonly property bool active: service ? service.running : false
 

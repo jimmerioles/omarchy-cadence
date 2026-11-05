@@ -1,7 +1,6 @@
 {
   "widget.name": "Focus",
   "widget.tooltip": "Focus timer",
-  "widget.hint": "Right-click start/pause · Middle-click reset",
   "panel.deep": "Deep work",
   "panel.pomodoro": "Pomodoro",
   "panel.break": "Break",

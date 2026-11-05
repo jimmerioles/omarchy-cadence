@@ -24,11 +24,6 @@ BarWidget {
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
-  // The time stays on the bar in every state, so starting or pausing does not
-  // change the widget's width and shift its neighbors.
-  readonly property string barText: root.vertical
-    ? root.glyph
-    : root.glyph + "  " + root.timeText
   readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Focus")
   readonly property string tooltipText: {
     if (!service) return strings.t("widget.tooltip", "Focus timer")
@@ -40,9 +35,23 @@ BarWidget {
   }
   readonly property bool active: service ? service.running : false
 
-  // The bar draws an open-panel dot under what a text widget actually paints.
-  readonly property real openPanelIndicatorWidth: button.labelWidth
-  readonly property real openPanelIndicatorHeight: Math.max(Style.space(10), Math.round(Style.bar.iconSlot * 0.55))
+  // The bar label uses the same icon+value composition as the first-party
+  // status widgets. The slot is measured from the countdown so the timer
+  // never clips or changes width as the digits change.
+  FontMetrics {
+    id: timeMetrics
+    font.family: root.bar ? root.bar.fontFamily : Style.font.family
+    font.pixelSize: Style.bar.iconFont
+  }
+  // Measure the full session length rather than the ticking value, so the
+  // slot keeps its width when the countdown crosses a digit boundary.
+  readonly property string slotTimeText: service
+    ? FocusModel.formatClock(service.totalMs, Commons.I18n.formatNumber)
+    : root.timeText
+  readonly property real timeWidth: timeMetrics.advanceWidth(root.slotTimeText)
+  readonly property real buttonSlot: Math.max(
+    Style.bar.iconSlot * 2,
+    Math.ceil(root.timeWidth) + Style.bar.iconCanvas + Style.space(8))
 
   function resolveService() {
     if (root.service) return
@@ -136,20 +145,15 @@ BarWidget {
     function status(): string { return root.service ? root.service.status() : "{}" }
   }
 
-  WidgetButton {
+  BarIconButton {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: root.barText
-    fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
-    fontSize: root.vertical ? Style.bar.iconFont : Style.font.body
-    horizontalMargin: 8.75
-    verticalPadding: 8.75
+    text: root.glyph
+    labelText: root.vertical ? "" : root.timeText
+    slotSize: root.vertical ? Style.bar.iconSlot : root.buttonSlot
     tooltipText: root.tooltipText
     active: root.active
-    activeColor: Commons.Color.accent
-    hasVisualContent: true
-    pressFeedbackButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
     onPressed: function(button) {
       if (button === Qt.RightButton) {

@@ -4,8 +4,9 @@ import qs.Commons as Commons
 import qs.Ui
 import "FocusModel.js" as FocusModel
 
-// Control panel for the shared Focus service. Opening, closing, and popout
-// switching are inherited from Panel; the service owns all timer state.
+// Control panel for the shared Focus service. The layout follows the
+// first-party panels: a PanelHero header, one large readout, a progress bar,
+// a separator, then the session picker and transport controls.
 Panel {
   id: root
   moduleName: "jimmerioles.focus"
@@ -21,7 +22,6 @@ Panel {
 
   readonly property color contentForeground: bar ? bar.foreground : Commons.Color.foreground
   readonly property string contentFontFamily: bar ? bar.fontFamily : Style.font.family
-  readonly property color dim: Util.alpha(root.contentForeground, 0.55)
 
   Commons.Translations {
     id: strings
@@ -45,18 +45,19 @@ Panel {
   readonly property bool queuedModeDiffers: service
     ? service.mode !== service.sessionMode
     : false
-  readonly property string glyph: root.breakPhase
-    ? "\u{f0176}"
-    : "\u{f051b}"
+  readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f051b}"
+
   readonly property string phaseLabel: !service
     ? strings.t("widget.name", "Focus")
-    : service.phase === "break"
+    : root.breakPhase
       ? strings.t("panel.break", "Break")
-      : (service.sessionMode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.pomodoro", "Pomodoro"))
+      : (service.sessionMode === "deep"
+        ? strings.t("panel.deep", "Deep work")
+        : strings.t("panel.pomodoro", "Pomodoro"))
   readonly property string phaseMeta: {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
-    if (service.phase === "break")
+    if (root.breakPhase)
       return strings.t("panel.breakMeta", "Step away and reset for %1 minutes").arg(minutes)
     return (service.sessionMode === "deep"
       ? strings.t("panel.deepMeta", "%1 minute ultradian focus block")
@@ -67,6 +68,9 @@ Panel {
     : service.running
       ? strings.t("panel.running", "Running")
       : (service.paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))
+  readonly property string heroMeta: !service
+    ? strings.t("panel.unavailable", "Focus service is still loading.")
+    : root.statusLabel + " · " + root.phaseMeta
   readonly property string primaryLabel: !service
     ? strings.t("panel.start", "Start")
     : service.running
@@ -82,9 +86,6 @@ Panel {
     ? strings.t("panel.skipBreak", "Skip break")
     : strings.t("panel.reset", "Reset")
   readonly property string secondaryIcon: root.breakPhase ? "\u{f04ad}" : "\u{f0709}"
-  readonly property string keysHint: root.breakPhase
-    ? strings.t("panel.keysBreak", "Space toggle · R skip · 1/2 mode")
-    : strings.t("panel.keys", "Space toggle · R reset · 1/2 mode")
   readonly property real progress: service ? service.progress : 0
   readonly property int sessions: service ? service.sessionsToday : 0
   readonly property var modeOptions: [
@@ -142,90 +143,21 @@ Panel {
         width: parent.width
         spacing: Style.space(14)
 
-        Text {
-          visible: !root.service
+        // ---- Hero: the current phase, state, and session length.
+        PanelHero {
           width: parent.width
-          text: strings.t("panel.unavailable", "Focus service is still loading.")
-          textFormat: Text.PlainText
-          color: root.dim
-          font.family: root.contentFontFamily
-          font.pixelSize: Style.font.bodySmall
-          wrapMode: Text.Wrap
-        }
+          title: root.phaseLabel
+          meta: root.heroMeta
+          foreground: root.contentForeground
+          fontFamily: root.contentFontFamily
 
-        // ---- Hero: what phase is running, and its current state.
-        Item {
-          width: parent.width
-          height: Math.max(heroGlyph.implicitHeight, heroLabels.implicitHeight, statusPill.implicitHeight)
-
-          Text {
-            id: heroGlyph
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.glyph
-            textFormat: Text.PlainText
-            color: root.breakPhase ? Commons.Color.accent : root.contentForeground
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.display
-          }
-
-          Column {
-            id: heroLabels
-            anchors.left: heroGlyph.right
-            anchors.leftMargin: Style.space(12)
-            anchors.right: statusPill.left
-            anchors.rightMargin: Style.space(12)
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Style.space(2)
-
+          iconComponent: Component {
             Text {
-              width: parent.width
-              text: root.phaseLabel
               textFormat: Text.PlainText
+              text: root.glyph
               color: root.contentForeground
               font.family: root.contentFontFamily
-              font.pixelSize: Style.font.title
-              font.bold: true
-              elide: Text.ElideRight
-            }
-
-            Text {
-              width: parent.width
-              text: root.phaseMeta
-              textFormat: Text.PlainText
-              color: root.dim
-              font.family: root.contentFontFamily
-              font.pixelSize: Style.font.caption
-              elide: Text.ElideRight
-            }
-          }
-
-          BorderSurface {
-            id: statusPill
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: statusText.implicitWidth + Style.space(12)
-            implicitHeight: statusText.implicitHeight + Style.space(4)
-            radius: Style.cornerRadius
-            color: root.service && root.service.running
-              ? Util.alpha(Commons.Color.accent, 0.14)
-              : "transparent"
-            borderSpec: Border.controlSpec(
-              root.service && (root.service.running || root.breakPhase) ? "selected" : "normal",
-              root.contentForeground,
-              Commons.Color.accent)
-
-            Text {
-              id: statusText
-              anchors.centerIn: parent
-              text: root.statusLabel
-              textFormat: Text.PlainText
-              color: root.service && (root.service.running || root.breakPhase)
-                ? Commons.Color.accent
-                : root.dim
-              font.family: root.contentFontFamily
-              font.pixelSize: Style.font.caption
-              font.bold: true
+              font.pixelSize: Style.font.display
             }
           }
         }
@@ -235,16 +167,17 @@ Panel {
           width: parent.width
           text: root.timeText
           textFormat: Text.PlainText
-          color: root.breakPhase ? Commons.Color.accent : root.contentForeground
+          color: root.contentForeground
           font.family: root.contentFontFamily
           font.pixelSize: Math.round(Style.font.displayLarge * 1.65)
           font.bold: true
           horizontalAlignment: Text.AlignHCenter
         }
 
+        // ---- Progress.
         Item {
           width: parent.width
-          height: Style.space(4)
+          height: Style.space(8)
 
           Rectangle {
             anchors.fill: parent
@@ -253,67 +186,115 @@ Panel {
           }
 
           Rectangle {
-            width: parent.width * root.progress
+            width: Math.max(parent.height, parent.width * root.progress)
             height: parent.height
             radius: height / 2
-            color: Commons.Color.accent
+            color: root.contentForeground
+
             Behavior on width {
               NumberAnimation {
-                duration: Style.duration(240)
-                easing.type: Easing.Linear
+                duration: Style.duration(280)
+                easing.type: Easing.OutCubic
               }
             }
           }
         }
 
-        // ---- Session type. While a session is active the chips choose the
-        //      type for the next work block instead of interrupting this one.
-        PanelSectionHeader {
-          text: root.sessionTypeLabel
-          foreground: root.contentForeground
-          fontFamily: root.contentFontFamily
-        }
-
-        Item {
+        // ---- Today's completed focus blocks, as a label/value stat row.
+        Row {
           width: parent.width
-          height: modeGroup.implicitHeight
+          spacing: Style.space(8)
 
-          ButtonGroup {
-            id: modeGroup
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            options: root.modeOptions
-            value: root.service ? root.service.mode : "deep"
-            foreground: root.contentForeground
-            accent: Commons.Color.accent
-            fontFamily: root.contentFontFamily
-            focusable: false
-            onChanged: function(value) { root.selectMode(value) }
+          Text {
+            text: strings.t("panel.today", "Today")
+            textFormat: Text.PlainText
+            color: root.contentForeground
+            opacity: 0.6
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.bodySmall
+          }
+
+          Item {
+            width: Math.max(0, parent.width - parent.children[0].implicitWidth
+              - parent.children[2].implicitWidth - parent.spacing * 2)
+            height: 1
+          }
+
+          Text {
+            text: strings.tn("panel.sessionCount", root.sessions, "%1 sessions")
+              .arg(Commons.I18n.formatNumber(root.sessions, 0))
+            textFormat: Text.PlainText
+            color: root.contentForeground
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.bodySmall
           }
         }
 
-        Text {
-          visible: root.queuedModeDiffers
+        PanelSeparator {
+          foreground: root.contentForeground
+        }
+
+        // ---- Session type. While a session is active the buttons choose
+        //      the type for the next work block instead of interrupting this one.
+        Column {
           width: parent.width
-          text: strings.t("panel.nextHint", "Applies to the next focus session.")
-          textFormat: Text.PlainText
-          color: root.dim
-          font.family: root.contentFontFamily
-          font.pixelSize: Style.font.caption
-          wrapMode: Text.Wrap
+          spacing: Style.space(10)
+
+          PanelSectionHeader {
+            text: root.sessionTypeLabel
+            foreground: root.contentForeground
+            fontFamily: root.contentFontFamily
+          }
+
+          Row {
+            id: modeRow
+            width: parent.width
+            spacing: Style.space(6)
+
+            Repeater {
+              model: root.modeOptions
+
+              delegate: Button {
+                required property var modelData
+                width: (modeRow.width - modeRow.spacing) / 2
+                text: modelData.label
+                active: root.service
+                  ? root.service.mode === modelData.value
+                  : modelData.value === "deep"
+                bordered: true
+                fontSize: Style.font.bodySmall
+                foreground: root.contentForeground
+                accent: Commons.Color.accent
+                fontFamily: root.contentFontFamily
+                horizontalPadding: Style.spacing.controlPaddingX
+                verticalPadding: Style.spacing.controlPaddingY + Style.space(2)
+                onClicked: root.selectMode(modelData.value)
+              }
+            }
+          }
+
+          Text {
+            visible: root.queuedModeDiffers
+            width: parent.width
+            text: strings.t("panel.nextHint", "Applies to the next focus session.")
+            textFormat: Text.PlainText
+            color: root.contentForeground
+            opacity: 0.6
+            font.family: root.contentFontFamily
+            font.pixelSize: Style.font.caption
+            wrapMode: Text.Wrap
+          }
         }
 
         // ---- Transport.
         Row {
           width: parent.width
-          spacing: Style.space(8)
+          spacing: Style.space(6)
 
           Button {
-            id: primaryButton
-            width: Math.round((parent.width - parent.spacing) * 0.62)
+            width: (parent.width - parent.spacing) / 2
             text: root.primaryLabel
             iconText: root.service && root.service.running ? "\u{f03e4}" : "\u{f040a}"
-            selected: true
             bordered: true
             foreground: root.contentForeground
             accent: Commons.Color.accent
@@ -322,7 +303,7 @@ Panel {
           }
 
           Button {
-            width: parent.width - primaryButton.width - parent.spacing
+            width: (parent.width - parent.spacing) / 2
             text: root.secondaryLabel
             iconText: root.secondaryIcon
             bordered: true
@@ -330,38 +311,6 @@ Panel {
             accent: Commons.Color.accent
             fontFamily: root.contentFontFamily
             onClicked: root.secondaryAction()
-          }
-        }
-
-        // ---- Today + keyboard hints.
-        Item {
-          width: parent.width
-          height: Math.max(sessionsText.implicitHeight, keysText.implicitHeight)
-
-          Text {
-            id: sessionsText
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            text: strings.tn("panel.sessions", root.sessions, "%1 sessions today")
-              .arg(Commons.I18n.formatNumber(root.sessions, 0))
-            textFormat: Text.PlainText
-            color: root.dim
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.caption
-          }
-
-          Text {
-            id: keysText
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.min(implicitWidth, Math.max(0, parent.width - sessionsText.width - Style.space(8)))
-            text: root.keysHint
-            textFormat: Text.PlainText
-            color: root.dim
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.caption
-            horizontalAlignment: Text.AlignRight
-            elide: Text.ElideRight
           }
         }
       }

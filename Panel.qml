@@ -52,8 +52,8 @@ Panel {
     : root.breakPhase
       ? strings.t("panel.break", "Break")
       : (service.sessionMode === "deep"
-        ? strings.t("panel.deep", "Deep work")
-        : strings.t("panel.shortWork", "Short work"))
+        ? strings.t("panel.deep", "Deep Focus")
+        : strings.t("panel.shortWork", "Short Focus"))
   readonly property string phaseMeta: {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
@@ -75,8 +75,8 @@ Panel {
         : root.breakPhase
           ? strings.t("panel.startBreak", "Start break")
           : (service.sessionMode === "deep"
-            ? strings.t("panel.startDeep", "Start deep work")
-            : strings.t("panel.startShortWork", "Start short work"))
+            ? strings.t("panel.startDeep", "Start deep focus")
+            : strings.t("panel.startShortWork", "Start short focus"))
   readonly property string secondaryLabel: root.breakPhase
     ? strings.t("panel.skipBreak", "Skip break")
     : strings.t("panel.reset", "Reset")
@@ -87,13 +87,13 @@ Panel {
     {
       value: "deep",
       label: strings.t("panel.ultradian", "Ultradian"),
-      tooltip: strings.t("panel.ultradianHint", "%1 minute deep work block")
+      tooltip: strings.t("panel.ultradianHint", "%1 minute deep focus block")
         .arg(numberText(service ? service.deepMinutes : 90))
     },
     {
       value: "pomodoro",
       label: strings.t("panel.pomodoro", "Pomodoro"),
-      tooltip: strings.t("panel.pomodoroHint", "%1 minute short work block")
+      tooltip: strings.t("panel.pomodoroHint", "%1 minute short focus block")
         .arg(numberText(service ? service.pomodoroMinutes : 25))
     }
   ]

@@ -64,7 +64,7 @@ Item {
 
   readonly property string phaseLabel: phase === "break"
     ? strings.t("panel.break", "Break")
-    : (sessionMode === "deep" ? strings.t("panel.deep", "Deep work") : strings.t("panel.shortWork", "Short work"))
+    : (sessionMode === "deep" ? strings.t("panel.deep", "Deep Focus") : strings.t("panel.shortWork", "Short Focus"))
   readonly property string statusLabel: running
     ? strings.t("panel.running", "Running")
     : (paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))

@@ -6,10 +6,10 @@ A Pomodoro and ultradian focus timer for the [Omarchy](https://omarchy.org/) bar
 
 Two session types, each with its own recovery break:
 
-- **Ultradian** — 90 minutes of deep work, followed by a 20 minute break.
-- **Pomodoro** — 25 minutes of short work, followed by a 5 minute break.
+- **Ultradian** — 90 minutes of deep focus, followed by a 20 minute break.
+- **Pomodoro** — 25 minutes of short focus, followed by a 5 minute break.
 
-The session buttons choose the method; the panel hero and action button use the work type, so the context stays visible when the button changes from Start to Pause.
+The session buttons choose the method; the panel hero and action button use the focus type, so the context stays visible when the button changes from Start to Pause.
 
 The timer lives in a shared Omarchy shell service, so every monitor shows the same countdown and a bar reload does not lose the session. A running session also survives a shell restart: the end time is stored on disk and the timer resumes from that wall-clock deadline.
 
@@ -90,10 +90,10 @@ omarchy bar set jimmerioles.focus notifications true
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| `deepMinutes` | `90` | Length of a deep work block. |
-| `pomodoroMinutes` | `25` | Length of a short work block. |
-| `deepBreakMinutes` | `20` | Break after deep work. |
-| `shortBreakMinutes` | `5` | Break after short work. |
+| `deepMinutes` | `90` | Length of a deep focus block. |
+| `pomodoroMinutes` | `25` | Length of a short focus block. |
+| `deepBreakMinutes` | `20` | Break after deep focus. |
+| `shortBreakMinutes` | `5` | Break after short focus. |
 | `autoStartBreak` | `true` | Start the break when work ends. |
 | `autoStartWork` | `false` | Start the next work block when a break ends. |
 | `notifications` | `true` | Send a desktop notification when a phase ends. |

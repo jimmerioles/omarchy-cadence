@@ -56,6 +56,36 @@ test("catalog values are non-empty strings or complete plural objects", () => {
   }
 })
 
+test("the catalog has no legacy session-type keys", () => {
+  for (const key of [
+    "panel.shortWork",
+    "panel.startShortWork",
+    "panel.ultradianChip",
+    "panel.pomodoroChip",
+    "panel.ultradianHint",
+    "panel.pomodoroHint",
+    "notify.pomodoroDone"
+  ]) {
+    assert.equal(key in catalog, false, `${key} must not survive the vocabulary refactor`)
+  }
+})
+
+test("session types label the UI while methods explain the choice", () => {
+  assert.match(catalog["panel.deep"], /^Deep Focus$/)
+  assert.match(catalog["panel.short"], /^Short Focus$/)
+  assert.match(catalog["panel.deepChip"], /^Deep Focus · %1 min$/)
+  assert.match(catalog["panel.shortChip"], /^Short Focus · %1 min$/)
+  assert.match(catalog["panel.startDeep"], /^Start deep focus$/)
+  assert.match(catalog["panel.startShort"], /^Start short focus$/)
+  assert.match(catalog["notify.deepDone"], /^Deep Focus complete/)
+  assert.match(catalog["notify.shortDone"], /^Short Focus complete/)
+
+  assert.match(catalog["panel.deepHint"], /^Ultradian/)
+  assert.match(catalog["panel.shortHint"], /^Pomodoro/)
+  assert.doesNotMatch(catalog["panel.deep"], /Ultradian|Pomodoro/)
+  assert.doesNotMatch(catalog["panel.short"], /Ultradian|Pomodoro/)
+})
+
 test("the session count is pluralized", () => {
   assert.equal(typeof catalog["panel.sessionCount"], "object")
   assert.equal(catalog["panel.sessionCount"].one, "%1 session")

@@ -165,7 +165,7 @@ ShellRoot {
       root.service.configure({ deepMinutes: 45, notifications: false })
       root.check(root.service.totalMs === 45 * 60000, "recovered timer follows the configured duration")
       root.service.saveNow()
-      if (!root.waitFor(root.fileContains(stateFile, '"version":1'), 5000, "recovered state was not rewritten")) return
+      if (!root.waitFor(root.fileContains(stateFile, '"version":2'), 5000, "recovered state was not rewritten")) return
       root.finish()
     }
   }

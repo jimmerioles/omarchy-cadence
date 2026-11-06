@@ -29,7 +29,7 @@ ShellRoot {
     property real progress: 0.2
     property int sessionsToday: 1
     property int deepMinutes: 90
-    property int pomodoroMinutes: 25
+    property int shortMinutes: 25
     property int breakMinutes: 20
     property string phaseLabel: "Deep Focus"
     property string statusLabel: "Running"

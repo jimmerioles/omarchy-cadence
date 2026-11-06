@@ -114,7 +114,7 @@ ShellRoot {
 
       root.service.configure({
         deepMinutes: 45,
-        pomodoroMinutes: 30,
+        shortMinutes: 30,
         deepBreakMinutes: 10,
         shortBreakMinutes: 3,
         autoStartBreak: false,
@@ -180,15 +180,17 @@ ShellRoot {
       root.check(!root.service.running, "skip break leaves the next work block ready")
       root.check(root.service.sessionMode === "deep", "skip break keeps the queued mode")
       root.check(root.service.totalMs === 45 * 60000, "skip break restores the work length")
-      root.service.selectMode("pomodoro")
+      root.service.selectMode("short")
       root.next(8)
       return
     }
 
     if (root.step === 8) {
-      root.check(root.service.mode === "pomodoro", "mode selection updates the queued mode")
-      root.check(root.service.sessionMode === "pomodoro", "idle mode selection updates the ready session")
-      root.check(root.service.totalMs === 30 * 60000, "idle mode selection uses the pomodoro length")
+      root.check(root.service.mode === "short", "mode selection updates the queued mode")
+      root.check(root.service.sessionMode === "short", "idle mode selection updates the ready session")
+      root.check(root.service.totalMs === 30 * 60000, "idle mode selection uses the short length")
+      var shortStatus = JSON.parse(root.service.status())
+      root.check(shortStatus.mode === "short", "status reports the short session type")
       root.service.startMode("deep")
       root.next(9)
       return

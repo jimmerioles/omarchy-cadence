@@ -21,6 +21,10 @@ function effects(overrides) {
   return Object.assign(Model.noEffects(), overrides || {})
 }
 
+function encoded(overrides) {
+  return JSON.stringify(Object.assign({ version: Model.STATE_VERSION }, overrides || {}))
+}
+
 module.exports = {
   Model: Model,
   CONFIG: CONFIG,
@@ -28,5 +32,6 @@ module.exports = {
   at: at,
   state: state,
   config: config,
-  effects: effects
+  effects: effects,
+  encoded: encoded
 }

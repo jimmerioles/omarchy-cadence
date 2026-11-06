@@ -2,7 +2,7 @@
 
 const { test } = require("node:test")
 const assert = require("node:assert/strict")
-const { Model, at, state } = require("./support.js")
+const { Model, at, state, encoded } = require("./support.js")
 
 test("clampNumber falls back for invalid values and clamps the rest", () => {
   assert.equal(Model.clampNumber(5, 7, 0, 10), 5)
@@ -67,7 +67,7 @@ test("dateKey is local and zero-pads month and day", () => {
 test("defaultConfig matches the documented defaults", () => {
   assert.deepEqual(Model.defaultConfig(), {
     deepMinutes: 90,
-    pomodoroMinutes: 25,
+    shortMinutes: 25,
     deepBreakMinutes: 20,
     shortBreakMinutes: 5,
     autoStartBreak: true,
@@ -79,7 +79,7 @@ test("defaultConfig matches the documented defaults", () => {
 test("configLimits match the manifest schema", () => {
   assert.deepEqual(Model.configLimits(), {
     deepMinutes: { min: 15, max: 180, step: 5 },
-    pomodoroMinutes: { min: 5, max: 60, step: 5 },
+    shortMinutes: { min: 5, max: 60, step: 5 },
     deepBreakMinutes: { min: 5, max: 45, step: 5 },
     shortBreakMinutes: { min: 1, max: 15, step: 1 }
   })
@@ -110,13 +110,13 @@ test("resolveConfig clamps values and reports whether anything changed", () => {
 
   const clamped = Model.resolveConfig(current, {
     deepMinutes: 1,
-    pomodoroMinutes: 999,
+    shortMinutes: 999,
     deepBreakMinutes: "30",
     shortBreakMinutes: 0
   })
   assert.equal(clamped.changed, true)
   assert.equal(clamped.config.deepMinutes, 15)
-  assert.equal(clamped.config.pomodoroMinutes, 60)
+  assert.equal(clamped.config.shortMinutes, 60)
   assert.equal(clamped.config.deepBreakMinutes, 30)
   assert.equal(clamped.config.shortBreakMinutes, 1)
 
@@ -132,11 +132,18 @@ test("resolveConfig clamps values and reports whether anything changed", () => {
 
   const invalid = Model.resolveConfig(current, {
     deepMinutes: "nonsense",
-    pomodoroMinutes: null,
+    shortMinutes: null,
     autoStartBreak: "maybe"
   })
   assert.equal(invalid.changed, false)
   assert.deepEqual(invalid.config, current)
+})
+
+test("resolveConfig ignores the old pomodoroMinutes key", () => {
+  const current = Model.defaultConfig()
+  const result = Model.resolveConfig(current, { pomodoroMinutes: 40 })
+  assert.equal(result.changed, false)
+  assert.equal(result.config.shortMinutes, 25)
 })
 
 test("resolveConfig does not mutate the current configuration", () => {
@@ -147,23 +154,23 @@ test("resolveConfig does not mutate the current configuration", () => {
 })
 
 test("workMinutes and breakMinutes follow the selected work type", () => {
-  const config = { deepMinutes: 90, pomodoroMinutes: 25, deepBreakMinutes: 20, shortBreakMinutes: 5 }
+  const config = { deepMinutes: 90, shortMinutes: 25, deepBreakMinutes: 20, shortBreakMinutes: 5 }
   assert.equal(Model.workMinutes(config, "deep"), 90)
-  assert.equal(Model.workMinutes(config, "pomodoro"), 25)
+  assert.equal(Model.workMinutes(config, "short"), 25)
   assert.equal(Model.breakMinutes(config, "deep"), 20)
-  assert.equal(Model.breakMinutes(config, "pomodoro"), 5)
+  assert.equal(Model.breakMinutes(config, "short"), 5)
   assert.equal(Model.workMinutes(undefined, "deep"), 90)
-  assert.equal(Model.workMinutes(undefined, "pomodoro"), 25)
+  assert.equal(Model.workMinutes(undefined, "short"), 25)
   assert.equal(Model.breakMinutes(undefined, "deep"), 20)
-  assert.equal(Model.breakMinutes(undefined, "pomodoro"), 5)
+  assert.equal(Model.breakMinutes(undefined, "short"), 5)
 })
 
 test("durationFor never returns less than a minute", () => {
   const config = Model.defaultConfig()
   assert.equal(Model.durationFor(config, { sessionMode: "deep" }, "work"), 90 * 60000)
   assert.equal(Model.durationFor(config, { sessionMode: "deep" }, "break"), 20 * 60000)
-  assert.equal(Model.durationFor(config, { sessionMode: "pomodoro" }, "work"), 25 * 60000)
-  assert.equal(Model.durationFor(config, { sessionMode: "pomodoro" }, "break"), 5 * 60000)
+  assert.equal(Model.durationFor(config, { sessionMode: "short" }, "work"), 25 * 60000)
+  assert.equal(Model.durationFor(config, { sessionMode: "short" }, "break"), 5 * 60000)
   assert.equal(Model.durationFor({ deepMinutes: 0 }, { sessionMode: "deep" }, "work"), 60000)
 })
 
@@ -185,10 +192,20 @@ test("parseState rejects anything that is not a state object", () => {
   assert.equal(Model.parseState("[]"), null)
   assert.equal(Model.parseState('"string"'), null)
   assert.equal(Model.parseState("42"), null)
+  assert.equal(Model.parseState("{}"), null)
 })
 
-test("parseState fills defaults for an empty object", () => {
-  assert.deepEqual(Model.parseState("{}"), {
+test("parseState rejects a state file from the old vocabulary", () => {
+  assert.equal(Model.parseState(JSON.stringify({ version: 1, mode: "pomodoro" })), null)
+  assert.equal(Model.parseState(JSON.stringify({ version: 0 })), null)
+  assert.equal(Model.parseState(JSON.stringify({ version: 3 })), null)
+  assert.equal(Model.parseState(JSON.stringify({ version: "2" })), null)
+  assert.equal(Model.parseState(JSON.stringify({ version: 2, mode: "pomodoro" })), null)
+  assert.equal(Model.parseState(JSON.stringify({ version: 2, sessionMode: "pomodoro" })), null)
+})
+
+test("parseState fills defaults for a version 2 state", () => {
+  assert.deepEqual(Model.parseState(encoded({})), {
     mode: "deep",
     sessionMode: "deep",
     phase: "work",
@@ -204,8 +221,8 @@ test("parseState fills defaults for an empty object", () => {
 })
 
 test("parseState normalizes modes, phase, booleans, and numbers", () => {
-  const parsed = Model.parseState(JSON.stringify({
-    mode: "pomodoro",
+  const parsed = Model.parseState(encoded({
+    mode: "short",
     sessionMode: "deep",
     phase: "break",
     running: true,
@@ -217,7 +234,7 @@ test("parseState normalizes modes, phase, booleans, and numbers", () => {
     sessionsToday: 12.6,
     sessionsDate: 42
   }))
-  assert.equal(parsed.mode, "pomodoro")
+  assert.equal(parsed.mode, "short")
   assert.equal(parsed.sessionMode, "deep")
   assert.equal(parsed.phase, "break")
   assert.equal(parsed.running, true)
@@ -231,7 +248,7 @@ test("parseState normalizes modes, phase, booleans, and numbers", () => {
 })
 
 test("parseState clamps wildly out-of-range values", () => {
-  const parsed = Model.parseState(JSON.stringify({
+  const parsed = Model.parseState(encoded({
     endsAt: 1e30,
     remainingMs: 1e30,
     totalMs: 1e30,
@@ -244,23 +261,23 @@ test("parseState clamps wildly out-of-range values", () => {
 })
 
 test("parseState infers a paused session from a partial remaining time", () => {
-  const paused = Model.parseState(JSON.stringify({ running: false, remainingMs: 1000, totalMs: 5000 }))
+  const paused = Model.parseState(encoded({ running: false, remainingMs: 1000, totalMs: 5000 }))
   assert.equal(paused.paused, true)
 
-  const ready = Model.parseState(JSON.stringify({ running: false, remainingMs: 5000, totalMs: 5000 }))
+  const ready = Model.parseState(encoded({ running: false, remainingMs: 5000, totalMs: 5000 }))
   assert.equal(ready.paused, false)
 
-  const nearDone = Model.parseState(JSON.stringify({ running: false, remainingMs: 4600, totalMs: 5000 }))
+  const nearDone = Model.parseState(encoded({ running: false, remainingMs: 4600, totalMs: 5000 }))
   assert.equal(nearDone.paused, false)
 })
 
 test("parseState lets an explicit paused flag win over inference", () => {
-  assert.equal(Model.parseState(JSON.stringify({ running: false, paused: false, remainingMs: 1000, totalMs: 5000 })).paused, false)
-  assert.equal(Model.parseState(JSON.stringify({ running: false, paused: true, remainingMs: 5000, totalMs: 5000 })).paused, true)
+  assert.equal(Model.parseState(encoded({ running: false, paused: false, remainingMs: 1000, totalMs: 5000 })).paused, false)
+  assert.equal(Model.parseState(encoded({ running: false, paused: true, remainingMs: 5000, totalMs: 5000 })).paused, true)
 })
 
 test("parseState only accepts strict running and DND booleans", () => {
-  const parsed = Model.parseState(JSON.stringify({ running: "true", dndOwned: 1 }))
+  const parsed = Model.parseState(encoded({ running: "true", dndOwned: 1 }))
   assert.equal(parsed.running, false)
   assert.equal(parsed.dndOwned, false)
   assert.equal(parsed.paused, false)
@@ -269,7 +286,7 @@ test("parseState only accepts strict running and DND booleans", () => {
 test("serializeState writes the versioned state and rounds milliseconds", () => {
   const now = at(2026, 0, 15, 12, 0, 0)
   const running = state({
-    mode: "pomodoro",
+    mode: "short",
     sessionMode: "deep",
     phase: "break",
     running: true,
@@ -282,8 +299,8 @@ test("serializeState writes the versioned state and rounds milliseconds", () => 
     sessionsDate: "2026-01-15"
   })
   assert.deepEqual(Model.serializeState(running, now), {
-    version: 1,
-    mode: "pomodoro",
+    version: 2,
+    mode: "short",
     sessionMode: "deep",
     phase: "break",
     running: true,
@@ -304,8 +321,8 @@ test("serializeState writes the versioned state and rounds milliseconds", () => 
 test("serializeState and parseState round-trip a session", () => {
   const now = at(2026, 0, 15, 12, 0, 0)
   const original = state({
-    mode: "pomodoro",
-    sessionMode: "pomodoro",
+    mode: "short",
+    sessionMode: "short",
     phase: "work",
     paused: true,
     remainingMs: 1250000,
@@ -320,16 +337,16 @@ test("serializeState and parseState round-trip a session", () => {
 test("statusSnapshot reports the same shape as the IPC status", () => {
   const now = at(2026, 0, 15, 12, 0, 0)
   const running = state({
-    mode: "pomodoro",
-    sessionMode: "pomodoro",
+    mode: "short",
+    sessionMode: "short",
     running: true,
     endsAt: now + 7500,
     totalMs: 15000,
     sessionsToday: 2
   })
   assert.deepEqual(Model.statusSnapshot(running, now, "Short Focus"), {
-    mode: "pomodoro",
-    sessionMode: "pomodoro",
+    mode: "short",
+    sessionMode: "short",
     phase: "work",
     running: true,
     paused: false,

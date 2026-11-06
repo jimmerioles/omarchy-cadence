@@ -104,6 +104,22 @@ test("manifest schema keys match the default keys", () => {
   assert.equal(new Set(schemaKeys).size, schemaKeys.length, "schema keys must be unique")
 })
 
+test("the settings vocabulary uses session types, not method names", () => {
+  assert.equal("shortMinutes" in manifest.barWidget.defaults, true)
+  assert.equal("pomodoroMinutes" in manifest.barWidget.defaults, false)
+  assert.deepEqual(
+    manifest.barWidget.schema.filter((entry) => entry.type === "integer").map((entry) => entry.key).sort(),
+    ["deepBreakMinutes", "deepMinutes", "shortBreakMinutes", "shortMinutes"]
+  )
+
+  const deep = manifest.barWidget.schema.find((entry) => entry.key === "deepMinutes")
+  const short = manifest.barWidget.schema.find((entry) => entry.key === "shortMinutes")
+  assert.match(deep.label, /Deep Focus/)
+  assert.match(deep.description, /Ultradian/)
+  assert.match(short.label, /Short Focus/)
+  assert.match(short.description, /Pomodoro/)
+})
+
 test("manifest schema bounds match the code's bounds", () => {
   const limits = Model.configLimits()
   for (const entry of manifest.barWidget.schema) {

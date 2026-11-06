@@ -8,7 +8,7 @@
 // must apply. Nothing here touches QML, processes, translation catalogs, or
 // Date.now(), which is what makes the whole timer testable from Node.
 
-var STATE_VERSION = 1
+var STATE_VERSION = 2
 var MAX_STATE_MS = 8640000000000000
 var MAX_SESSION_MS = 12 * 60 * 60 * 1000
 var MIN_SESSION_MS = 60 * 1000
@@ -56,7 +56,7 @@ function dateKey(date) {
 function defaultConfig() {
   return {
     deepMinutes: 90,
-    pomodoroMinutes: 25,
+    shortMinutes: 25,
     deepBreakMinutes: 20,
     shortBreakMinutes: 5,
     autoStartBreak: true,
@@ -68,7 +68,7 @@ function defaultConfig() {
 function configLimits() {
   return {
     deepMinutes: { min: 15, max: 180, step: 5 },
-    pomodoroMinutes: { min: 5, max: 60, step: 5 },
+    shortMinutes: { min: 5, max: 60, step: 5 },
     deepBreakMinutes: { min: 5, max: 45, step: 5 },
     shortBreakMinutes: { min: 1, max: 15, step: 1 }
   }
@@ -96,7 +96,7 @@ function resolveConfig(current, values) {
 
   var next = {
     deepMinutes: configNumber(v.deepMinutes, base.deepMinutes, fallback.deepMinutes, limits.deepMinutes),
-    pomodoroMinutes: configNumber(v.pomodoroMinutes, base.pomodoroMinutes, fallback.pomodoroMinutes, limits.pomodoroMinutes),
+    shortMinutes: configNumber(v.shortMinutes, base.shortMinutes, fallback.shortMinutes, limits.shortMinutes),
     deepBreakMinutes: configNumber(v.deepBreakMinutes, base.deepBreakMinutes, fallback.deepBreakMinutes, limits.deepBreakMinutes),
     shortBreakMinutes: configNumber(v.shortBreakMinutes, base.shortBreakMinutes, fallback.shortBreakMinutes, limits.shortBreakMinutes),
     autoStartBreak: boolValue(v.autoStartBreak, base.autoStartBreak === true),
@@ -105,7 +105,7 @@ function resolveConfig(current, values) {
   }
 
   var changed = next.deepMinutes !== base.deepMinutes
-    || next.pomodoroMinutes !== base.pomodoroMinutes
+    || next.shortMinutes !== base.shortMinutes
     || next.deepBreakMinutes !== base.deepBreakMinutes
     || next.shortBreakMinutes !== base.shortBreakMinutes
     || next.autoStartBreak !== (base.autoStartBreak === true)
@@ -117,23 +117,26 @@ function resolveConfig(current, values) {
 
 // ---- Session values ---------------------------------------------------
 
+function canonicalMode(value) {
+  if (value === "deep" || value === "short") return value
+  return null
+}
+
 function normalizedMode(value, fallback) {
-  if (value === "pomodoro") return "pomodoro"
-  if (value === "deep") return "deep"
-  return fallback === "pomodoro" ? "pomodoro" : "deep"
+  return canonicalMode(value) || canonicalMode(fallback) || "deep"
 }
 
 function workMinutes(config, mode) {
   var c = config || defaultConfig()
-  var minutes = mode === "pomodoro" ? Number(c.pomodoroMinutes) : Number(c.deepMinutes)
-  if (!isFinite(minutes)) minutes = mode === "pomodoro" ? 25 : 90
+  var minutes = mode === "short" ? Number(c.shortMinutes) : Number(c.deepMinutes)
+  if (!isFinite(minutes)) minutes = mode === "short" ? 25 : 90
   return minutes
 }
 
 function breakMinutes(config, mode) {
   var c = config || defaultConfig()
-  var minutes = mode === "pomodoro" ? Number(c.shortBreakMinutes) : Number(c.deepBreakMinutes)
-  if (!isFinite(minutes)) minutes = mode === "pomodoro" ? 5 : 20
+  var minutes = mode === "short" ? Number(c.shortBreakMinutes) : Number(c.deepBreakMinutes)
+  if (!isFinite(minutes)) minutes = mode === "short" ? 5 : 20
   return minutes
 }
 
@@ -184,6 +187,9 @@ function parseState(raw) {
     return null
   }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null
+  if (parsed.version !== STATE_VERSION) return null
+  if (parsed.mode !== undefined && canonicalMode(parsed.mode) === null) return null
+  if (parsed.sessionMode !== undefined && canonicalMode(parsed.sessionMode) === null) return null
 
   var state = copyState(parsed)
   state.paused = typeof parsed.paused === "boolean"
@@ -332,13 +338,14 @@ function skipBreak(state, config) {
 }
 
 function selectMode(state, config, next) {
-  if (next !== "deep" && next !== "pomodoro") {
+  var mode = canonicalMode(next)
+  if (!mode) {
     return { state: state, effects: noEffects() }
   }
 
   state = copyState(state)
 
-  if (next === state.mode) {
+  if (mode === state.mode) {
     if (state.phase === "work" && !state.running && !state.paused && state.sessionMode !== state.mode) {
       state.sessionMode = state.mode
       state.totalMs = durationFor(config, state, "work")
@@ -348,7 +355,7 @@ function selectMode(state, config, next) {
     return { state: state, effects: noEffects() }
   }
 
-  state.mode = next
+  state.mode = mode
   if (state.phase === "work" && !state.running && !state.paused) {
     state.sessionMode = state.mode
     state.totalMs = durationFor(config, state, "work")
@@ -358,17 +365,18 @@ function selectMode(state, config, next) {
 }
 
 function startMode(state, config, next, now) {
-  if (next !== "deep" && next !== "pomodoro") {
+  var mode = canonicalMode(next)
+  if (!mode) {
     return { state: state, effects: noEffects() }
   }
   if (state.phase === "work" && (state.running || state.paused)) {
-    return selectMode(state, config, next)
+    return selectMode(state, config, mode)
   }
 
   state = copyState(state)
-  state.mode = next
+  state.mode = mode
   state.phase = "work"
-  state.sessionMode = next
+  state.sessionMode = mode
   state.running = false
   state.paused = false
   state.endsAt = 0
@@ -628,6 +636,7 @@ if (typeof module !== "undefined") {
     configLimits: configLimits,
     boolValue: boolValue,
     resolveConfig: resolveConfig,
+    canonicalMode: canonicalMode,
     normalizedMode: normalizedMode,
     workMinutes: workMinutes,
     breakMinutes: breakMinutes,

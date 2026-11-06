@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "jimmerioles.focus",
   "name": "Focus",
-  "version": "1.17.0",
+  "version": "2.0.0",
   "author": "Jim Merioles",
   "license": "MIT",
-  "description": "Pomodoro and ultradian focus timer with work and break sessions in the Omarchy bar.",
+  "description": "Deep Focus and Short Focus timer with Ultradian and Pomodoro methods in the Omarchy bar.",
   "kinds": [
     "bar-widget",
     "service"
@@ -16,13 +16,13 @@
   },
   "barWidget": {
     "displayName": "Focus",
-    "description": "Deep work and Pomodoro sessions with breaks and desktop notifications.",
+    "description": "Deep Focus and Short Focus sessions with breaks and desktop notifications.",
     "category": "Time",
     "allowMultiple": false,
     "defaultSection": "centerEnd",
     "defaults": {
       "deepMinutes": 90,
-      "pomodoroMinutes": 25,
+      "shortMinutes": 25,
       "deepBreakMinutes": 20,
       "shortBreakMinutes": 5,
       "autoStartBreak": true,
@@ -33,42 +33,42 @@
       {
         "key": "deepMinutes",
         "type": "integer",
-        "label": "Deep work length (minutes)",
+        "label": "Deep Focus length (minutes)",
         "min": 15,
         "max": 180,
         "step": 5,
         "defaultValue": 90,
-        "description": "Ultradian focus block. The standard is 90 minutes."
+        "description": "Ultradian method. The standard is 90 minutes."
       },
       {
-        "key": "pomodoroMinutes",
+        "key": "shortMinutes",
         "type": "integer",
-        "label": "Pomodoro length (minutes)",
+        "label": "Short Focus length (minutes)",
         "min": 5,
         "max": 60,
         "step": 5,
         "defaultValue": 25,
-        "description": "Short focus block for smaller tasks."
+        "description": "Pomodoro method. A short focus block for smaller tasks."
       },
       {
         "key": "deepBreakMinutes",
         "type": "integer",
-        "label": "Deep work break (minutes)",
+        "label": "Deep Focus break (minutes)",
         "min": 5,
         "max": 45,
         "step": 5,
         "defaultValue": 20,
-        "description": "Recovery after a deep work block."
+        "description": "Recovery after a Deep Focus block."
       },
       {
         "key": "shortBreakMinutes",
         "type": "integer",
-        "label": "Pomodoro break (minutes)",
+        "label": "Short Focus break (minutes)",
         "min": 1,
         "max": 15,
         "step": 1,
         "defaultValue": 5,
-        "description": "Short recovery after a Pomodoro."
+        "description": "Short recovery after a Short Focus block."
       },
       {
         "key": "autoStartBreak",

@@ -1,8 +1,8 @@
 {
   "name": "omarchy-focus",
   "private": true,
-  "version": "1.17.0",
-  "description": "Pomodoro and ultradian focus timer for the Omarchy bar.",
+  "version": "2.0.0",
+  "description": "Deep Focus and Short Focus timer with Ultradian and Pomodoro methods for the Omarchy bar.",
   "engines": {
     "node": ">=20"
   },

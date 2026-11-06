@@ -166,8 +166,8 @@ run_fixture() {
   if [[ $name == "restart" ]]; then
     grep -q 'notifications setDnd false' "$TMP/commands.log" || fail "$name" "destroying a running service did not release DND"
     [[ -f $TMP/home/.local/state/omarchy/focus/state.json ]] || fail "$name" "the recovered state file is missing"
-    jq -e '.version == 1' "$TMP/home/.local/state/omarchy/focus/state.json" >/dev/null 2>&1 \
-      || fail "$name" "the recovered state file is not version 1"
+    jq -e '.version == 2' "$TMP/home/.local/state/omarchy/focus/state.json" >/dev/null 2>&1 \
+      || fail "$name" "the recovered state file is not version 2"
   fi
 
   echo "ok - qml fixture: $name"

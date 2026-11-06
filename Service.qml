@@ -30,7 +30,7 @@ Item {
   // Defaults come from FocusModel so the manifest contract test can compare
   // both against the schema instead of keeping a third copy in QML.
   property int deepMinutes: FocusModel.defaultConfig().deepMinutes
-  property int pomodoroMinutes: FocusModel.defaultConfig().pomodoroMinutes
+  property int shortMinutes: FocusModel.defaultConfig().shortMinutes
   property int deepBreakMinutes: FocusModel.defaultConfig().deepBreakMinutes
   property int shortBreakMinutes: FocusModel.defaultConfig().shortBreakMinutes
   property bool autoStartBreak: FocusModel.defaultConfig().autoStartBreak
@@ -38,11 +38,11 @@ Item {
   property bool notifications: FocusModel.defaultConfig().notifications
 
   // ---- Session ----------------------------------------------------------
-  // mode is the work type chosen for the next session; sessionMode is the
+  // mode is the session type chosen for the next session; sessionMode is the
   // type the current work block or break belongs to. They differ while a
   // session is running if the user has already picked what comes next.
-  property string mode: "deep"          // "deep" | "pomodoro"
-  property string sessionMode: "deep"   // "deep" | "pomodoro"
+  property string mode: "deep"          // "deep" | "short"
+  property string sessionMode: "deep"   // "deep" | "short"
   property string phase: "work"         // "work" | "break"
   property bool running: false
   property bool paused: false
@@ -63,12 +63,12 @@ Item {
   readonly property real progress: totalMs > 0
     ? Util.clamp(1 - effectiveRemainingMs / totalMs, 0, 1)
     : 0
-  readonly property int workMinutes: sessionMode === "deep" ? deepMinutes : pomodoroMinutes
+  readonly property int workMinutes: sessionMode === "deep" ? deepMinutes : shortMinutes
   readonly property int breakMinutes: sessionMode === "deep" ? deepBreakMinutes : shortBreakMinutes
 
   readonly property string phaseLabel: phase === "break"
     ? strings.t("panel.break", "Break")
-    : (sessionMode === "deep" ? strings.t("panel.deep", "Deep Focus") : strings.t("panel.shortWork", "Short Focus"))
+    : (sessionMode === "deep" ? strings.t("panel.deep", "Deep Focus") : strings.t("panel.short", "Short Focus"))
   readonly property string statusLabel: running
     ? strings.t("panel.running", "Running")
     : (paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))
@@ -77,7 +77,7 @@ Item {
   function configSnapshot() {
     return {
       deepMinutes: deepMinutes,
-      pomodoroMinutes: pomodoroMinutes,
+      shortMinutes: shortMinutes,
       deepBreakMinutes: deepBreakMinutes,
       shortBreakMinutes: shortBreakMinutes,
       autoStartBreak: autoStartBreak,
@@ -149,7 +149,7 @@ Item {
 
     var next = resolved.config
     deepMinutes = next.deepMinutes
-    pomodoroMinutes = next.pomodoroMinutes
+    shortMinutes = next.shortMinutes
     deepBreakMinutes = next.deepBreakMinutes
     shortBreakMinutes = next.shortBreakMinutes
     autoStartBreak = next.autoStartBreak
@@ -244,7 +244,7 @@ Item {
     var minutes = Commons.I18n.formatNumber(breakMinutes, 0)
     var title = (sessionMode === "deep"
       ? strings.t("notify.deepDone", "Deep Focus complete · %1")
-      : strings.t("notify.pomodoroDone", "Short Focus complete · %1")).arg(completionTime())
+      : strings.t("notify.shortDone", "Short Focus complete · %1")).arg(completionTime())
     var body = autoStartBreak
       ? strings.t("notify.breakStarted", "A %1 minute break has started. Step away.").arg(minutes)
       : strings.t("notify.breakReady", "A %1 minute break is ready. Start it when you are.").arg(minutes)

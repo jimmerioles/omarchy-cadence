@@ -1,17 +1,23 @@
 # Focus
 
-A Pomodoro and ultradian focus timer for the [Omarchy](https://omarchy.org/) bar.
+A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar, using the Ultradian and Pomodoro methods.
 
 ![Focus panel](assets/focus-panel.png)
 
 Two session types, each with its own recovery break:
 
-- **Ultradian** — 90 minutes of Deep Focus, followed by a 20 minute break.
-- **Pomodoro** — 25 minutes of Short Focus, followed by a 5 minute break.
+- **Deep Focus** (Ultradian method) — 90 minutes of work, followed by a 20 minute break.
+- **Short Focus** (Pomodoro method) — 25 minutes of work, followed by a 5 minute break.
 
-The session buttons choose the focus type; their tooltips name the underlying method. The panel hero and action button keep the focus type visible when the button changes from Start to Pause.
+The session buttons choose the session type; their tooltips name the underlying method. The panel hero and action button keep the session type visible when the button changes from Start to Pause.
 
 The timer lives in a shared Omarchy shell service, so every monitor shows the same countdown and a bar reload does not lose the session. A running session also survives a shell restart: the end time is stored on disk and the timer resumes from that wall-clock deadline.
+
+## Vocabulary
+
+- **Session type** — Deep Focus or Short Focus, chosen in the panel.
+- **Method** — Ultradian or Pomodoro, the rhythm or technique behind a session type.
+- **Mode** — the session type selected for the next work block; settings and IPC use `deep` or `short`.
 
 ## Features
 
@@ -19,7 +25,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 - Panel with session type, progress, start/pause, and reset.
 - The session type is locked while a work block is running, so a stray click cannot change the current session.
 - Session buttons show their configured lengths (`Deep Focus · 90 min`, `Short Focus · 25 min`), so both options stay comparable while queueing the next block. Tooltips name the Ultradian and Pomodoro methods, explain what each is best for, and give concrete examples; they appear on both hover and keyboard focus.
-- While a session is active, the session-type header shows the upcoming sequence on its right: the break and next focus type during work, or just the next focus type during a break.
+- While a session is active, the session-type header shows the upcoming sequence on its right: the break and next session type during work, or just the next session type during a break.
 - Skip a break from the panel to return to a ready focus block early.
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
 - Silences desktop notifications while a work block is active, then restores DND and replays Omarchy's notification history when the break begins.
@@ -59,9 +65,9 @@ omarchy plugin update jimmerioles.focus
 - **Right click**: start or pause.
 - **Middle click**: reset the current session.
 
-While a work block is running, the session type is locked. Pause the block or wait for the break to choose the next focus type. During a break, the buttons choose what comes next without changing the break.
+While a work block is running, the session type is locked. Pause the block or wait for the break to choose the next session type. During a break, the buttons choose what comes next without changing the break.
 
-While a work block is paused, **Reset** applies the queued focus type immediately. During a break, **Reset** restarts the break instead.
+While a work block is paused, **Reset** applies the queued session type immediately. During a break, **Reset** restarts the break instead.
 
 During a break the secondary button becomes **Skip break**; select it and press `Enter` or `Space` to return to a ready focus block.
 
@@ -75,14 +81,14 @@ omarchy-shell jimmerioles.focus toggleTimer
 omarchy-shell jimmerioles.focus reset
 omarchy-shell jimmerioles.focus skipBreak
 omarchy-shell jimmerioles.focus setMode deep
-omarchy-shell jimmerioles.focus setMode pomodoro
+omarchy-shell jimmerioles.focus setMode short
 omarchy-shell jimmerioles.focus startMode deep
-omarchy-shell jimmerioles.focus startMode pomodoro
+omarchy-shell jimmerioles.focus startMode short
 omarchy-shell jimmerioles.focus open
 omarchy-shell jimmerioles.focus close
 ```
 
-`status` returns JSON with the selected and current mode, phase, paused/running state, remaining milliseconds, progress, and today's completed session count.
+`status` returns JSON with the selected and current mode, phase, paused/running state, remaining milliseconds, progress, and today's completed session count. The `mode` and `sessionMode` values are `deep` or `short`.
 
 ### Notifications and DND
 
@@ -122,7 +128,7 @@ Settings are stored on the widget's entry in `~/.config/omarchy/shell.json`. The
 
 ```bash
 omarchy bar set jimmerioles.focus deepMinutes 90
-omarchy bar set jimmerioles.focus pomodoroMinutes 25
+omarchy bar set jimmerioles.focus shortMinutes 25
 omarchy bar set jimmerioles.focus deepBreakMinutes 20
 omarchy bar set jimmerioles.focus shortBreakMinutes 5
 omarchy bar set jimmerioles.focus autoStartBreak true
@@ -133,7 +139,7 @@ omarchy bar set jimmerioles.focus notifications true
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `deepMinutes` | `90` | Length of a Deep Focus block. |
-| `pomodoroMinutes` | `25` | Length of a Short Focus block. |
+| `shortMinutes` | `25` | Length of a Short Focus block. |
 | `deepBreakMinutes` | `20` | Break after Deep Focus. |
 | `shortBreakMinutes` | `5` | Break after Short Focus. |
 | `autoStartBreak` | `true` | Start the break when work ends. |

@@ -20,10 +20,10 @@ test("initialState is a ready Deep Focus block", () => {
 })
 
 test("start begins a fresh work session in the selected mode", () => {
-  const result = Model.start(state({ mode: "pomodoro" }), CONFIG, NOW)
+  const result = Model.start(state({ mode: "short" }), CONFIG, NOW)
   assert.equal(result.state.running, true)
   assert.equal(result.state.paused, false)
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.remainingMs, 25 * 60000)
   assert.equal(result.state.endsAt, NOW + 25 * 60000)
@@ -38,13 +38,13 @@ test("start re-asserts DND when Focus already owns it", () => {
 test("start resumes a paused work session without changing its length", () => {
   const paused = state({
     mode: "deep",
-    sessionMode: "pomodoro",
+    sessionMode: "short",
     paused: true,
     totalMs: 25 * 60000,
     remainingMs: 10 * 60000
   })
   const result = Model.start(paused, CONFIG, NOW)
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.remainingMs, 10 * 60000)
   assert.equal(result.state.endsAt, NOW + 10 * 60000)
@@ -53,7 +53,7 @@ test("start resumes a paused work session without changing its length", () => {
 })
 
 test("start begins a break without touching DND", () => {
-  const result = Model.start(state({ phase: "break", sessionMode: "pomodoro", totalMs: 5 * 60000, remainingMs: 5 * 60000 }), CONFIG, NOW)
+  const result = Model.start(state({ phase: "break", sessionMode: "short", totalMs: 5 * 60000, remainingMs: 5 * 60000 }), CONFIG, NOW)
   assert.equal(result.state.running, true)
   assert.equal(result.state.totalMs, 5 * 60000)
   assert.equal(result.state.endsAt, NOW + 5 * 60000)
@@ -108,7 +108,7 @@ test("pause is a no-op when the timer is not running", () => {
 
 test("reset returns a work session to the queued mode and releases DND", () => {
   const running = state({
-    mode: "pomodoro",
+    mode: "short",
     sessionMode: "deep",
     running: true,
     dndOwned: true,
@@ -119,7 +119,7 @@ test("reset returns a work session to the queued mode and releases DND", () => {
   const result = Model.reset(running, CONFIG)
   assert.equal(result.state.running, false)
   assert.equal(result.state.paused, false)
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.remainingMs, 25 * 60000)
   assert.equal(result.state.dndOwned, false)
@@ -132,19 +132,19 @@ test("reset leaves a user-owned DND alone when Focus never owned it", () => {
 })
 
 test("reset restarts the break without changing the break type", () => {
-  const result = Model.reset(state({ phase: "break", sessionMode: "pomodoro", totalMs: 5 * 60000, remainingMs: 1000 }), CONFIG)
+  const result = Model.reset(state({ phase: "break", sessionMode: "short", totalMs: 5 * 60000, remainingMs: 1000 }), CONFIG)
   assert.equal(result.state.phase, "break")
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 5 * 60000)
   assert.equal(result.state.remainingMs, 5 * 60000)
   assert.deepEqual(result.effects, effects({ save: true }))
 })
 
 test("skipBreak returns to a ready work block in the queued mode", () => {
-  const result = Model.skipBreak(state({ phase: "break", mode: "pomodoro", sessionMode: "deep" }), CONFIG)
+  const result = Model.skipBreak(state({ phase: "break", mode: "short", sessionMode: "deep" }), CONFIG)
   assert.equal(result.state.phase, "work")
   assert.equal(result.state.running, false)
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.remainingMs, 25 * 60000)
   assert.deepEqual(result.effects, effects({ save: true }))
@@ -158,9 +158,9 @@ test("skipBreak is a no-op during work", () => {
 })
 
 test("selectMode applies a new mode to an idle work session", () => {
-  const result = Model.selectMode(state(), CONFIG, "pomodoro")
-  assert.equal(result.state.mode, "pomodoro")
-  assert.equal(result.state.sessionMode, "pomodoro")
+  const result = Model.selectMode(state(), CONFIG, "short")
+  assert.equal(result.state.mode, "short")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.remainingMs, 25 * 60000)
   assert.deepEqual(result.effects, effects({ save: true }))
@@ -168,8 +168,8 @@ test("selectMode applies a new mode to an idle work session", () => {
 
 test("selectMode queues a mode while work is running", () => {
   const running = state({ running: true, endsAt: NOW + 10000, totalMs: 90 * 60000, remainingMs: 90 * 60000 })
-  const result = Model.selectMode(running, CONFIG, "pomodoro")
-  assert.equal(result.state.mode, "pomodoro")
+  const result = Model.selectMode(running, CONFIG, "short")
+  assert.equal(result.state.mode, "short")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.totalMs, 90 * 60000)
   assert.equal(result.state.running, true)
@@ -178,8 +178,8 @@ test("selectMode queues a mode while work is running", () => {
 
 test("selectMode queues a mode while work is paused", () => {
   const paused = state({ paused: true, totalMs: 90 * 60000, remainingMs: 10 * 60000 })
-  const result = Model.selectMode(paused, CONFIG, "pomodoro")
-  assert.equal(result.state.mode, "pomodoro")
+  const result = Model.selectMode(paused, CONFIG, "short")
+  assert.equal(result.state.mode, "short")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.totalMs, 90 * 60000)
   assert.equal(result.state.paused, true)
@@ -187,15 +187,15 @@ test("selectMode queues a mode while work is paused", () => {
 
 test("selectMode queues a mode during a break without changing the break", () => {
   const breakState = state({ phase: "break", sessionMode: "deep", totalMs: 20 * 60000, remainingMs: 20 * 60000 })
-  const result = Model.selectMode(breakState, CONFIG, "pomodoro")
-  assert.equal(result.state.mode, "pomodoro")
+  const result = Model.selectMode(breakState, CONFIG, "short")
+  assert.equal(result.state.mode, "short")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.totalMs, 20 * 60000)
   assert.equal(result.state.phase, "break")
 })
 
 test("selectMode repairs an idle work session whose sessionMode drifted", () => {
-  const drifted = state({ mode: "deep", sessionMode: "pomodoro", phase: "work" })
+  const drifted = state({ mode: "deep", sessionMode: "short", phase: "work" })
   const result = Model.selectMode(drifted, CONFIG, "deep")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.totalMs, 90 * 60000)
@@ -211,25 +211,34 @@ test("selectMode ignores the same mode when there is nothing to repair", () => {
 
 test("selectMode rejects unknown modes", () => {
   const current = state()
-  const result = Model.selectMode(current, CONFIG, "ultradian")
+  const result = Model.selectMode(current, CONFIG, "garbage")
   assert.equal(result.state, current)
   assert.deepEqual(result.effects, effects())
 })
 
+test("selectMode rejects the old method names", () => {
+  const current = state()
+  for (const value of ["pomodoro", "ultradian"]) {
+    const result = Model.selectMode(current, CONFIG, value)
+    assert.equal(result.state, current)
+    assert.deepEqual(result.effects, effects())
+  }
+})
+
 test("startMode starts a fresh work block when idle", () => {
-  const result = Model.startMode(state(), CONFIG, "pomodoro", NOW)
+  const result = Model.startMode(state(), CONFIG, "short", NOW)
   assert.equal(result.state.phase, "work")
   assert.equal(result.state.running, true)
-  assert.equal(result.state.mode, "pomodoro")
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.mode, "short")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 25 * 60000)
   assert.equal(result.state.endsAt, NOW + 25 * 60000)
 })
 
 test("startMode queues instead of destroying a running work block", () => {
   const running = state({ running: true, mode: "deep", sessionMode: "deep", endsAt: NOW + 10000, totalMs: 90 * 60000, remainingMs: 90 * 60000 })
-  const result = Model.startMode(running, CONFIG, "pomodoro", NOW)
-  assert.equal(result.state.mode, "pomodoro")
+  const result = Model.startMode(running, CONFIG, "short", NOW)
+  assert.equal(result.state.mode, "short")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.running, true)
   assert.equal(result.state.totalMs, 90 * 60000)
@@ -237,15 +246,15 @@ test("startMode queues instead of destroying a running work block", () => {
 
 test("startMode queues instead of destroying a paused work block", () => {
   const paused = state({ paused: true, mode: "deep", sessionMode: "deep", totalMs: 90 * 60000, remainingMs: 10 * 60000 })
-  const result = Model.startMode(paused, CONFIG, "pomodoro", NOW)
-  assert.equal(result.state.mode, "pomodoro")
+  const result = Model.startMode(paused, CONFIG, "short", NOW)
+  assert.equal(result.state.mode, "short")
   assert.equal(result.state.sessionMode, "deep")
   assert.equal(result.state.paused, true)
   assert.equal(result.state.remainingMs, 10 * 60000)
 })
 
 test("startMode gives way to a requested work block during a break", () => {
-  const breakState = state({ phase: "break", sessionMode: "pomodoro", totalMs: 5 * 60000, remainingMs: 5 * 60000 })
+  const breakState = state({ phase: "break", sessionMode: "short", totalMs: 5 * 60000, remainingMs: 5 * 60000 })
   const result = Model.startMode(breakState, CONFIG, "deep", NOW)
   assert.equal(result.state.phase, "work")
   assert.equal(result.state.sessionMode, "deep")
@@ -255,9 +264,18 @@ test("startMode gives way to a requested work block during a break", () => {
 
 test("startMode rejects unknown modes", () => {
   const current = state()
-  const result = Model.startMode(current, CONFIG, "ultradian", NOW)
+  const result = Model.startMode(current, CONFIG, "garbage", NOW)
   assert.equal(result.state, current)
   assert.deepEqual(result.effects, effects())
+})
+
+test("startMode rejects the old method names", () => {
+  const current = state()
+  for (const value of ["pomodoro", "ultradian"]) {
+    const result = Model.startMode(current, CONFIG, value, NOW)
+    assert.equal(result.state, current)
+    assert.deepEqual(result.effects, effects())
+  }
 })
 
 test("finishPhase turns a work block into a ready break", () => {
@@ -313,7 +331,7 @@ test("finishPhase turns a break into a ready work block", () => {
 })
 
 test("finishPhase auto-starts the next work block when configured", () => {
-  const running = state({ phase: "break", sessionMode: "pomodoro", running: true, endsAt: NOW, totalMs: 5 * 60000 })
+  const running = state({ phase: "break", sessionMode: "short", running: true, endsAt: NOW, totalMs: 5 * 60000 })
   const result = Model.finishPhase(running, config({ autoStartWork: true }), NOW)
   assert.equal(result.state.phase, "work")
   assert.equal(result.state.running, true)
@@ -353,7 +371,7 @@ test("finishPast completes a work block silently", () => {
 })
 
 test("finishPast turns a past break into a ready work block", () => {
-  const past = state({ phase: "break", sessionMode: "pomodoro", running: true, dndOwned: true, endsAt: NOW - 1 })
+  const past = state({ phase: "break", sessionMode: "short", running: true, dndOwned: true, endsAt: NOW - 1 })
   const result = Model.finishPast(past, CONFIG, NOW)
   assert.equal(result.state.phase, "work")
   assert.equal(result.state.sessionMode, "deep")
@@ -383,17 +401,17 @@ test("tick only finishes a running session at or past its deadline", () => {
 })
 
 test("applyConfigToState follows a new duration for an idle session", () => {
-  const result = Model.applyConfigToState(state({ mode: "pomodoro", sessionMode: "deep" }), config({ pomodoroMinutes: 30 }))
-  assert.equal(result.state.sessionMode, "pomodoro")
+  const result = Model.applyConfigToState(state({ mode: "short", sessionMode: "deep" }), config({ shortMinutes: 30 }))
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 30 * 60000)
   assert.equal(result.state.remainingMs, 30 * 60000)
   assert.deepEqual(result.effects, effects({ save: true }))
 })
 
 test("applyConfigToState updates a ready break without changing its type", () => {
-  const result = Model.applyConfigToState(state({ phase: "break", sessionMode: "pomodoro", totalMs: 5 * 60000 }), config({ shortBreakMinutes: 7 }))
+  const result = Model.applyConfigToState(state({ phase: "break", sessionMode: "short", totalMs: 5 * 60000 }), config({ shortBreakMinutes: 7 }))
   assert.equal(result.state.phase, "break")
-  assert.equal(result.state.sessionMode, "pomodoro")
+  assert.equal(result.state.sessionMode, "short")
   assert.equal(result.state.totalMs, 7 * 60000)
   assert.equal(result.state.remainingMs, 7 * 60000)
 })
@@ -421,8 +439,8 @@ test("resolveLoadedState resets a missing or corrupt state", () => {
 
 test("resolveLoadedState resumes a session from its wall-clock deadline", () => {
   const parsed = {
-    mode: "pomodoro",
-    sessionMode: "pomodoro",
+    mode: "short",
+    sessionMode: "short",
     phase: "work",
     running: true,
     dndOwned: false,
@@ -490,7 +508,7 @@ test("resolveLoadedState silently finishes a work session that ended while the s
 test("resolveLoadedState silently finishes a break that ended while the shell was down", () => {
   const parsed = {
     phase: "break",
-    sessionMode: "pomodoro",
+    sessionMode: "short",
     running: true,
     dndOwned: true,
     endsAt: NOW - 1,
@@ -626,7 +644,7 @@ test("syncDndAfterLoad queries an unowned running work session", () => {
 
 test("transitions do not mutate their input state", () => {
   const original = state({
-    mode: "pomodoro",
+    mode: "short",
     sessionMode: "deep",
     running: true,
     dndOwned: true,

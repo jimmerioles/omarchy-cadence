@@ -49,8 +49,8 @@ Panel {
     ? (service.running || service.paused || service.phase === "break")
     : false
   readonly property string nextModeLabel: service
-    ? (service.mode === "pomodoro"
-      ? strings.t("panel.shortWork", "Short Focus")
+    ? (service.mode === "short"
+      ? strings.t("panel.short", "Short Focus")
       : strings.t("panel.deep", "Deep Focus"))
     : ""
   readonly property string nextIndicatorText: !service
@@ -67,7 +67,7 @@ Panel {
       ? strings.t("panel.break", "Break")
       : (service.sessionMode === "deep"
         ? strings.t("panel.deep", "Deep Focus")
-        : strings.t("panel.shortWork", "Short Focus"))
+        : strings.t("panel.short", "Short Focus"))
   readonly property string phaseMeta: {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
@@ -88,7 +88,7 @@ Panel {
           ? strings.t("panel.startBreak", "Start break")
           : (service.sessionMode === "deep"
             ? strings.t("panel.startDeep", "Start deep focus")
-            : strings.t("panel.startShortWork", "Start short focus"))
+            : strings.t("panel.startShort", "Start short focus"))
   readonly property string secondaryLabel: root.breakPhase
     ? strings.t("panel.skipBreak", "Skip break")
     : strings.t("panel.reset", "Reset")
@@ -98,15 +98,15 @@ Panel {
   readonly property var modeOptions: [
     {
       value: "deep",
-      label: strings.t("panel.ultradianChip", "Deep Focus · %1 min")
+      label: strings.t("panel.deepChip", "Deep Focus · %1 min")
         .arg(numberText(service ? service.deepMinutes : 90)),
-      tooltip: strings.t("panel.ultradianHint", "Ultradian · best for deep, uninterrupted work — coding, writing, learning")
+      tooltip: strings.t("panel.deepHint", "Ultradian · best for deep, uninterrupted work — coding, writing, learning")
     },
     {
-      value: "pomodoro",
-      label: strings.t("panel.pomodoroChip", "Short Focus · %1 min")
-        .arg(numberText(service ? service.pomodoroMinutes : 25)),
-      tooltip: strings.t("panel.pomodoroHint", "Pomodoro · best for quick tasks and admin work — email, errands, chores")
+      value: "short",
+      label: strings.t("panel.shortChip", "Short Focus · %1 min")
+        .arg(numberText(service ? service.shortMinutes : 25)),
+      tooltip: strings.t("panel.shortHint", "Pomodoro · best for quick tasks and admin work — email, errands, chores")
     }
   ]
 
@@ -123,7 +123,7 @@ Panel {
   function selectMode(value) {
     if (root.modeLocked) return
     if (service) service.selectMode(value)
-    root.modeIndex = value === "pomodoro" ? 1 : 0
+    root.modeIndex = value === "short" ? 1 : 0
   }
 
   // Keyboard cursor shared by the mouse and the panel key catcher, following
@@ -135,7 +135,7 @@ Panel {
   property int transportIndex: 0
 
   function modeIndexFor(value) {
-    return value === "pomodoro" ? 1 : 0
+    return value === "short" ? 1 : 0
   }
 
   function resetCursor() {

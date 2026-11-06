@@ -23,8 +23,8 @@
   "panel.nextAfterBreak": "Next: %1 min break → %2",
   "panel.ultradianChip": "Deep Focus · %1 min",
   "panel.pomodoroChip": "Short Focus · %1 min",
-  "panel.ultradianHint": "Ultradian · best for deep, uninterrupted work — coding, writing, learning",
-  "panel.pomodoroHint": "Pomodoro · best for quick tasks and admin work — email, errands, chores",
+  "panel.ultradianHint": "Ultradian · best for deep, uninterrupted work — research, building your craft, agentic engineering",
+  "panel.pomodoroHint": "Pomodoro · best for quick professional tasks — code review, inbox triage, small fixes",
   "panel.today": "Today",
   "panel.sessionCount": {
     "one": "%1 session",

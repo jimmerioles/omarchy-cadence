@@ -1,8 +1,24 @@
 # Using Cadence
 
-Cadence is a bar timer for two working rhythms. Deep Focus follows the Ultradian
-90/20 pattern; Short Focus follows Pomodoro 25/5. Both lengths are configurable,
-so the rhythm can fit your work instead of the other way around.
+Cadence is a focused workday system for the Omarchy bar. It is being built in
+wedges; this guide covers the first one: **Focus + Attention**.
+
+The first wedge is a bar timer for two working rhythms. Deep Focus follows the
+Ultradian 90/20 pattern; Short Focus follows Pomodoro 25/5. Both lengths are
+configurable, so the rhythm can fit your work instead of the other way around.
+
+## The Cadence loop
+
+Cadence is designed around one workday loop:
+
+1. **Decide** what matters.
+2. **Plan** when it happens.
+3. **Focus** on it, with attention protected.
+4. **Rest** before the next block.
+
+The first wedge ships steps 3 and 4. Steps 1 and 2—Plan (timeboxing) and Decide
+(the Eisenhower matrix)—are next. The [roadmap](../ROADMAP.md) has the full
+sequence.
 
 ## Concepts
 
@@ -144,7 +160,8 @@ not run its own notification daemon.
 
 The replay is Omarchy's shell-wide history: the latest six cards. It is not a
 focus-only list, so it may include older or unrelated notifications. Replaying
-again shows the same cards again.
+again shows the same cards again. A focus-session digest is planned for the next
+Attention release.
 
 ### Completion notifications
 
@@ -267,3 +284,16 @@ with:
 
 Do not paste notification contents or window titles into an issue. They are not
 needed to diagnose the timer.
+
+## What comes next
+
+The first wedge is Focus + Attention. The next releases add:
+
+- **Finish Attention** — session goals, a gentle drift guard, a parking lot, a
+  notification digest, and time integrity.
+- **Plan** — timeboxing: shape the day, give each block an intention, and start
+  a focus session from it.
+- **Decide** — an Eisenhower matrix: sort work by importance and urgency, then
+  turn the right task into a timebox or focus block.
+
+See the [roadmap](../ROADMAP.md) for the full sequence and scope boundaries.

@@ -1,6 +1,8 @@
 # Cadence reference
 
-Exact commands, settings, IPC, and state for Cadence.
+Exact commands, settings, IPC, and state for the shipped **Focus + Attention**
+wedge. Plan and Decide will add their own interfaces in later releases; this
+reference only documents what exists today.
 
 ## Compatibility
 
@@ -26,8 +28,8 @@ omarchy plugin remove jimmerioles.cadence
 ```
 
 Releases are tagged `vX.Y.Z`; [v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0)
-is the first. The installer and `omarchy plugin update` follow the default
-branch (`master`), not tags.
+is the first: the Focus + Attention core. The installer and
+`omarchy plugin update` follow the default branch (`master`), not tags.
 
 `omarchy plugin add --enable` validates the manifest, clones the repository into
 `~/.config/omarchy/plugins/jimmerioles.cadence`, and, when run interactively, asks
@@ -224,5 +226,6 @@ No notification contents or window titles are stored in the state file.
 ## Related docs
 
 - [Using Cadence](usage.md) — day-to-day behavior, DND, keyboard, troubleshooting.
-- [Architecture](architecture.md) — internals, state machine, testing.
+- [Architecture](architecture.md) — internals, state machine, testing, and how the next pillars fit.
+- [Roadmap](../ROADMAP.md) — product wedges, scope boundaries, and what comes next.
 - [Contributing](../CONTRIBUTING.md) — setup, tests, release checklist.

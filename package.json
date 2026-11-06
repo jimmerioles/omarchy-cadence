@@ -2,7 +2,7 @@
   "name": "omarchy-cadence",
   "private": true,
   "version": "1.0.0",
-  "description": "Cadence: a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
+  "description": "Cadence is a focused workday system for the Omarchy bar: a Deep Focus and Short Focus timer with automatic Do Not Disturb, building toward timeboxing and decision tools.",
   "engines": {
     "node": ">=20"
   },

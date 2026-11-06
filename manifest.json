@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "Jim Merioles",
   "license": "MIT",
-  "description": "Cadence: a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
+  "description": "Cadence is a focused workday system for the Omarchy bar: a Deep Focus and Short Focus timer with automatic Do Not Disturb, building toward timeboxing and decision tools.",
   "kinds": [
     "bar-widget",
     "service"
@@ -16,7 +16,7 @@
   },
   "barWidget": {
     "displayName": "Cadence",
-    "description": "Cadence adds Deep Focus and Short Focus sessions with automatic Do Not Disturb, breaks, and notification replay.",
+    "description": "Focus + Attention, the first Cadence wedge: Deep Focus and Short Focus sessions, automatic Do Not Disturb, breaks, and notification replay. Timeboxing and decision tools are next.",
     "category": "Time",
     "aliases": [
       "focus",

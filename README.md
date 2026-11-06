@@ -1,6 +1,8 @@
 # Cadence
 
-A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to keep your cadence, turn on Do Not Disturb while you work, hand you back a real break, and stay out of the way.
+**Your workday, in rhythm.**
+
+Cadence is a focused workday system for the [Omarchy](https://omarchy.org/) bar: focus deeply, protect your attention, plan your time, and decide what matters—without adding another place to manage.
 
 [![Tests](https://github.com/jimmerioles/omarchy-cadence/actions/workflows/test.yml/badge.svg)](https://github.com/jimmerioles/omarchy-cadence/actions/workflows/test.yml)
 [![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
@@ -8,7 +10,35 @@ A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar�
 
 ![Demo: a notification arrives, focus starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/focus-demo.gif)
 
+The demo shows the first wedge: **Focus + Attention**.
+
 ## Why Cadence
+
+Most productivity tools add another place to manage. Cadence connects the workday you already have:
+
+- **Focus without attention protection is just a countdown.** Notifications still win.
+- **Attention protection without a plan is just silence.** You still don't know what to do.
+- **Planning without decisions is a calendar full of the wrong things.**
+- **Decisions without focus are intentions that never ship.**
+
+Cadence connects them into one loop: **decide → plan → focus → rest**. Attention protects the focus block; the break is the rest.
+
+## Four tools, one rhythm
+
+| Pillar | What it does | Status |
+| --- | --- | --- |
+| **Focus** | Deep Focus (Ultradian 90/20) and Short Focus (Pomodoro 25/5) timers, automatic breaks. | Shipped |
+| **Attention** | Do Not Disturb ownership and notification replay. Session goals, Focus Guard, notification digest, and parking lot next. | Shipped core |
+| **Plan** | Timeboxing: shape the day into blocks, give each block an intention, and start a focus session from it. | Next major |
+| **Decide** | An Eisenhower matrix: sort work by importance and urgency, then turn the right task into a timebox or focus block. | Later |
+
+The tools are designed to share one local workday model. The bar is the glance; the panel is where you work. The full sequence is in the [roadmap](ROADMAP.md).
+
+## Start with the first wedge
+
+Cadence grows in complete, useful slices. The first is **Focus + Attention**—the part that delivers value on day one and earns the right to add planning and decisions.
+
+Today, Cadence gives you:
 
 - **Focus mode for your desktop.** Start a block and Cadence turns on Omarchy's Do Not Disturb—like Focus mode on your phone—and holds it through pauses. At the break, it restores the DND state it changed and replays recent notifications; DND you enabled yourself is left alone.
 - **Two rhythms.** Deep Focus follows the Ultradian 90/20 rhythm; Short Focus follows Pomodoro 25/5. Both are configurable.
@@ -45,7 +75,7 @@ omarchy plugin remove jimmerioles.cadence
 
 ### Releases
 
-Releases are tagged `vMAJOR.MINOR.PATCH`; [v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0) is the first tagged release. Tags mark stable snapshots for pinning or auditing, while the installer and `omarchy plugin update` track the default branch (`master`).
+Releases are tagged `vMAJOR.MINOR.PATCH`; [v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0) is the first tagged release: the Focus + Attention core. Tags mark stable snapshots for pinning or auditing, while the installer and `omarchy plugin update` track the default branch (`master`).
 
 Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
 
@@ -104,7 +134,7 @@ Once the panel is open:
 
 While a focus block is active—including pauses—Cadence turns on Do Not Disturb if it was off. At the break it restores the DND state it changed and asks Omarchy to replay recent notifications. A DND you turned on yourself is left alone.
 
-The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. Cadence completion notifications are sent after DND is restored and include their local send time.
+The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. A focus-session notification digest is planned for the next Attention release. Cadence completion notifications are sent after DND is restored and include their local send time.
 
 The demo above shows the core loop: a notification arrives, focus starts with DND on, another notification stays quiet, and notifications return after focus.
 
@@ -156,11 +186,26 @@ More in [Troubleshooting](docs/usage.md#troubleshooting).
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for what is shipped, what is next, and what is deliberately out of scope.
+Cadence ships in wedges:
+
+1. **Focus + Attention** (v1.0–1.1) — the shipped core; Focus Guard and the notification digest finish it.
+2. **Plan** (v2.0) — timeboxing.
+3. **Decide** (v3.0) — the Eisenhower matrix.
+
+See [ROADMAP.md](ROADMAP.md) for the full sequence, scope boundaries, and what is deliberately not planned.
+
+## Design principles
+
+- **One workday model, four views.** Focus sessions, timeboxes, tasks, and decisions will share one local state.
+- **Calm by default.** No badges, streaks, shame, or notification spam.
+- **Local-first and private.** No accounts, telemetry, or network calls.
+- **Keyboard-first, mouse-friendly.** Every control works without a mouse.
+- **Integrate, don't replace.** Use Omarchy's DND, notifications, theme, and keybindings.
+- **Ship one wedge completely.** A new pillar starts only when the previous wedge is excellent on its own.
 
 ## Development
 
-The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, a `bar-widget` entry point, and a `service` entry point. Timer rules live in `FocusModel.js` as pure functions; `Service.qml` owns QML state, timers, disk I/O, notifications, and other effects.
+The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, a `bar-widget` entry point, and a `service` entry point. Timer rules live in `FocusModel.js` as pure functions; `Service.qml` owns QML state, timers, disk I/O, notifications, and other effects. Future pillars follow the same pattern: a pure model, a QML view, and a service that applies effects.
 
 ```bash
 npm test

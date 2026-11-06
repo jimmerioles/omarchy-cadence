@@ -1,9 +1,10 @@
 # Architecture
 
-Cadence is a small Omarchy shell plugin with a deliberately narrow core: a pure
-timer model, a QML service that applies the model's effects, a bar widget, and
-a panel. The separation keeps every rule testable from Node and keeps QML
-changes away from timer logic.
+Cadence is a focused workday system built as a set of small, local-first tools.
+The first wedge is the focus timer and attention service: a pure timer model, a
+QML service that applies the model's effects, a bar widget, and a panel. The
+same pattern will carry the later pillars—Plan (timeboxing) and Decide (the
+Eisenhower matrix)—without turning the plugin into a second app.
 
 ## Repository map
 
@@ -15,8 +16,30 @@ changes away from timer logic.
 | `BarWidget.qml` | Icon-only bar entry and IPC handlers. |
 | `Panel.qml` | Panel UI, keyboard cursor, and per-control actions. |
 | `i18n/en.json` | English strings. |
+| `ROADMAP.md` | Product direction, wedge sequence, and scope boundaries. |
 | `test/` | Node tests, QML lint, and headless Quickshell fixtures. |
 | `docs/` | User guide, reference, and this architecture note. |
+
+## Product architecture
+
+Cadence is one product with four views:
+
+| Pillar | Job | Current home | Status |
+| --- | --- | --- | --- |
+| Focus | Start and run a focus block. | `FocusModel.js` + `Service.qml` | Shipped |
+| Attention | Protect the block and the break. | DND ownership in `Service.qml`; guard and digest planned | Shipped core |
+| Plan | Give the day a shape. | Timebox model (planned) | Next major |
+| Decide | Choose what matters. | Eisenhower model (planned) | Later |
+
+The pattern for each pillar:
+
+1. A pure model owns the rules and returns `{ state, effects }`.
+2. A QML view renders the model and forwards input.
+3. The service applies effects: timers, disk I/O, notifications, DND, IPC.
+4. The shared workday state lives in one private local directory.
+
+Do not add a second notification daemon, a second state store, or a separate
+app for each pillar. The bar is a glance; the panel is the workspace.
 
 ## Runtime flow
 
@@ -100,6 +123,31 @@ On load, `resolveLoadedState`:
 
 The file is deliberately defensive: a hand-edited or corrupt state can only
 produce a valid timer, never an unsafe duration or display value.
+
+## One workday state
+
+The first wedge stores timer state in
+`~/.local/state/omarchy/cadence/state.json`. Future pillars should extend the
+same private, versioned state rather than create separate stores. Add fields
+defensively; a corrupt or hand-edited file must still produce a valid timer and
+a clean panel.
+
+This keeps the product local-first and makes the four views part of one
+workday, not four disconnected tools.
+
+## Growing by wedge
+
+Wedge 1 (shipped) is Focus + Attention. The next pillars follow the same shape:
+
+- **Plan** adds a pure timebox model and a plan view. Starting a timebox should
+  start the existing focus service with the block's intention and mode; do not
+  duplicate the timer.
+- **Decide** adds a pure Eisenhower model and a task inbox. Sending a task to a
+  timebox or a focus block should use the Plan/Focus APIs, not a parallel path.
+- Keep each pillar's rules testable from Node and its effects in the service.
+- Ship each wedge completely before starting the next.
+
+The bar should stay quiet: a short current/next indicator, not a dashboard.
 
 ## DND ownership
 

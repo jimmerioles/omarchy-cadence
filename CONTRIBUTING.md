@@ -1,7 +1,8 @@
 # Contributing
 
-Thanks for helping improve Cadence. The timer core is small on purpose; the best
-changes are focused, tested, and easy to reason about.
+Thanks for helping improve Cadence. Cadence is a focused workday system built in
+wedges; the timer core is small on purpose, and the next pillar should be just
+as deliberate. The best changes are focused, tested, and easy to reason about.
 
 ## Before you start
 
@@ -11,6 +12,20 @@ You need:
 - Node 20 or newer
 - `jq` and `quickshell` for the QML checks
 - An Omarchy checkout at `OMARCHY_PATH` (defaults to `/usr/share/omarchy`)
+
+## Product shape
+
+Cadence grows in wedges. The first is **Focus + Attention**; **Plan**
+(timeboxing) and **Decide** (the Eisenhower matrix) follow. Each pillar should
+follow the same pattern:
+
+- a pure model with Node tests;
+- a QML view that only renders and forwards input;
+- a service that owns effects—timers, disk I/O, notifications, DND, and IPC;
+- shared local workday state.
+
+Do not add a second state store, a second notification daemon, or a separate app
+per pillar. When Plan needs to start a block, it should use the focus service.
 
 ## Develop against a live shell
 
@@ -82,11 +97,15 @@ desktop:
 
 ## Code conventions
 
-- Keep timer rules in `FocusModel.js` as pure functions. Do not read the clock,
-  QML objects, environment, or files there.
+- Keep each pillar's rules in a pure model. The current one is `FocusModel.js`;
+  future `PlanModel.js` and `DecideModel.js` should follow the same pattern. Do
+  not read the clock, QML objects, environment, or files there.
 - Keep side effects in `Service.qml`: timers, disk I/O, notifications, DND
-  commands, and IPC.
+  commands, and IPC. A later pillar may add its own service, but it must not
+  duplicate the focus timer or the notification daemon.
 - Return effects from the model instead of running commands from it.
+- Keep the shared workday state in one private, versioned directory. Extend it
+  defensively; do not add a second store.
 - Use the existing translation catalog for user-facing text. Keep strings whole
   with `%1` placeholders; use `Text.PlainText` where the plugin owns the text
   sink.
@@ -112,6 +131,11 @@ When adding or changing an IPC method:
 2. Add it to the IPC table in `docs/reference.md`.
 3. Run `npm test`; the docs test checks the table against the handlers.
 
+When a new pillar adds settings or IPC, update its pure model, its service, the
+manifest schema, `docs/reference.md`, and the README status table in the same
+pull request. Plan and Decide should reuse the existing focus APIs rather than
+creating parallel timer paths.
+
 ## Adding a language
 
 Cadence ships English only today, but the UI is ready for more catalogs:
@@ -132,11 +156,12 @@ English.
 
 The docs are part of the product:
 
-- `README.md` is the front door: install, use, configure, troubleshoot.
+- `README.md` is the front door: positioning, install, use, configure, troubleshoot.
 - `docs/usage.md` is the day-to-day manual and edge-case guide.
 - `docs/reference.md` is the exact settings, IPC, and state reference.
-- `docs/architecture.md` explains the internal design for contributors.
-- `ROADMAP.md` is directional and should not promise dates.
+- `docs/architecture.md` explains the internal design and how the next pillars fit.
+- `ROADMAP.md` is the product direction, wedge sequence, and scope boundaries; it
+  is directional and should not promise dates.
 
 If behavior changes, update the relevant doc in the same pull request. The docs
 test validates relative links, settings/defaults/ranges, IPC methods, the
@@ -146,7 +171,7 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
 
 1. Bump the same version in `manifest.json` and `package.json`.
 2. Update `ROADMAP.md` so the current release matches the manifest and the next
-   release is accurate.
+   release is accurate. Update the README's pillar status table if a wedge moved.
 3. Update the README, reference, or usage guide for any behavior change.
 4. Recapture `assets/focus-demo.gif` with Cadence captions if the panel or bar
    changed visibly.

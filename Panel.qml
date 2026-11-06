@@ -50,8 +50,8 @@ Panel {
     : false
   readonly property string nextModeLabel: service
     ? (service.mode === "pomodoro"
-      ? strings.t("panel.pomodoro", "Pomodoro")
-      : strings.t("panel.ultradian", "Ultradian"))
+      ? strings.t("panel.shortWork", "Short Focus")
+      : strings.t("panel.deep", "Deep Focus"))
     : ""
   readonly property string nextIndicatorText: !service
     ? ""
@@ -98,15 +98,15 @@ Panel {
   readonly property var modeOptions: [
     {
       value: "deep",
-      label: strings.t("panel.ultradianChip", "Ultradian · %1 min")
+      label: strings.t("panel.ultradianChip", "Deep Focus · %1 min")
         .arg(numberText(service ? service.deepMinutes : 90)),
-      tooltip: strings.t("panel.ultradianHint", "Deep Focus")
+      tooltip: strings.t("panel.ultradianHint", "Ultradian method")
     },
     {
       value: "pomodoro",
-      label: strings.t("panel.pomodoroChip", "Pomodoro · %1 min")
+      label: strings.t("panel.pomodoroChip", "Short Focus · %1 min")
         .arg(numberText(service ? service.pomodoroMinutes : 25)),
-      tooltip: strings.t("panel.pomodoroHint", "Short Focus")
+      tooltip: strings.t("panel.pomodoroHint", "Pomodoro method")
     }
   ]
 

@@ -128,6 +128,7 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     text: root.glyph
+    slotSize: Style.bar.statusSlot
     tooltipText: root.tooltipText
     active: root.active
 

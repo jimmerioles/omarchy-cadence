@@ -66,6 +66,8 @@ omarchy-shell jimmerioles.focus reset
 omarchy-shell jimmerioles.focus skipBreak
 omarchy-shell jimmerioles.focus setMode deep
 omarchy-shell jimmerioles.focus setMode pomodoro
+omarchy-shell jimmerioles.focus startMode deep
+omarchy-shell jimmerioles.focus startMode pomodoro
 omarchy-shell jimmerioles.focus open
 omarchy-shell jimmerioles.focus close
 ```
@@ -73,6 +75,22 @@ omarchy-shell jimmerioles.focus close
 `status` returns JSON with the current mode, phase, remaining milliseconds, progress, and today's completed session count.
 
 Notifications can be clicked to open the panel. When a break or work block is ready rather than auto-started, the notification also offers a button to start it.
+
+## Keybindings
+
+Add this to `~/.config/hypr/bindings.lua` for a `SUPER + ALT` shortcut family:
+
+```lua
+-- Focus timer
+o.bind("SUPER + ALT + T", "Focus timer: start/pause", "omarchy-shell jimmerioles.focus toggleTimer")
+o.bind("SUPER + ALT + O", "Focus timer: open panel", "omarchy-shell jimmerioles.focus toggle")
+o.bind("SUPER + ALT + D", "Focus timer: start deep focus", "omarchy-shell jimmerioles.focus startMode deep")
+o.bind("SUPER + ALT + P", "Focus timer: start Pomodoro", "omarchy-shell jimmerioles.focus startMode pomodoro")
+o.bind("SUPER + ALT + B", "Focus timer: skip break", "omarchy-shell jimmerioles.focus skipBreak")
+o.bind("SUPER + ALT + R", "Focus timer: reset session", "omarchy-shell jimmerioles.focus reset")
+```
+
+None of these replace a stock Omarchy binding. If a work session is already running, the mode shortcuts queue the chosen mode for the next block rather than interrupting the current session.
 
 ## Settings
 

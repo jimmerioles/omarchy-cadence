@@ -220,6 +220,27 @@ Item {
     saveSoon()
   }
 
+  // Start a fresh work block in the given mode. If a work session is already
+  // running or paused, queue the mode instead so a shortcut cannot destroy
+  // progress. A break gives way to the requested work block.
+  function startMode(value) {
+    if (value !== "deep" && value !== "pomodoro") return
+    if (phase === "work" && (running || paused)) {
+      selectMode(value)
+      return
+    }
+
+    mode = value
+    phase = "work"
+    sessionMode = value
+    running = false
+    endsAt = 0
+    nowMs = Date.now()
+    totalMs = durationFor("work")
+    remainingMs = totalMs
+    start()
+  }
+
   function tick() {
     nowMs = Date.now()
     if (running && endsAt <= nowMs) finishPhase()

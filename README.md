@@ -6,7 +6,7 @@ A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar�
 [![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3da639)](LICENSE)
 
-![Focus demo](assets/focus-demo.gif)
+![Focus demo: a notification arrives, focus starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/focus-demo.gif)
 
 ## Why Focus
 
@@ -100,6 +100,8 @@ Once the panel is open:
 While a focus block is active—including pauses—Focus turns on Do Not Disturb if it was off. At the break it restores the DND state it changed and asks Omarchy to replay recent notifications. A DND you turned on yourself is left alone.
 
 The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. Focus completion notifications are sent after DND is restored and include their local send time.
+
+The demo above shows the core loop: a notification arrives, focus starts with DND on, another notification stays quiet, and notifications return after focus.
 
 See [Notifications and DND](docs/usage.md#notifications-and-dnd) for the full behavior.
 

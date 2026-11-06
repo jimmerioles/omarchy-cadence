@@ -97,8 +97,8 @@ ready break yourself.
 
 | State | Icon | Hover |
 | --- | --- | --- |
-| Idle or paused focus | Dimmed target | Phase, remaining time, and state. |
-| Focus block running | Full target | Phase, remaining time, and state. |
+| Idle or paused focus | Dimmed pulse | Phase, remaining time, and state. |
+| Focus block running | Full pulse | Phase, remaining time, and state. |
 | Break ready or running | Stretching figure; dimmed when the break is not running | Phase, remaining time, and state. |
 
 - **Left click** opens or closes the panel.

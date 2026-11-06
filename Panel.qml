@@ -59,7 +59,7 @@ Panel {
       ? strings.t("panel.nextFocus", "Next: %1").arg(root.nextModeLabel)
       : strings.t("panel.nextAfterBreak", "Next: %1 min break → %2")
           .arg(numberText(service.breakMinutes)).arg(root.nextModeLabel)
-  readonly property string glyph: root.breakPhase ? "\u{f117c}" : "\u{f08c9}"
+  readonly property string glyph: root.breakPhase ? "\u{f117c}" : "\u{f0430}"
 
   readonly property string phaseLabel: !service
     ? strings.t("widget.name", "Cadence")

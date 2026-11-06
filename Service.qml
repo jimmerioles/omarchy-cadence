@@ -253,7 +253,7 @@ Item {
       extraAction = ["--action", strings.t("notify.startBreak", "Start break"),
                      "omarchy-shell", "jimmerioles.cadence", "start"]
     }
-    sendNotification(title, body, "\u{f08c9}", extraAction)
+    sendNotification(title, body, "\u{f0430}", extraAction)
   }
 
   function notifyBreakDone() {

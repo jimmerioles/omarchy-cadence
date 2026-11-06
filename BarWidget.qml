@@ -18,7 +18,7 @@ BarWidget {
   }
 
   readonly property bool breakPhase: service ? service.phase === "break" : false
-  readonly property string glyph: breakPhase ? "\u{f117c}" : "\u{f08c9}"
+  readonly property string glyph: breakPhase ? "\u{f117c}" : "\u{f0430}"
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"

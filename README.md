@@ -89,7 +89,7 @@ Plugins run as unsandboxed code inside the shell process. Only install plugins w
 | Right click | Start or pause the current block. |
 | Middle click | Reset the current block. |
 
-The icon is a dimmed target when focus is idle or paused, a full target while focusing, and a stretching figure during a break (dimmed until the break starts). Hover for the phase, remaining time, and state.
+The icon is a dimmed pulse when focus is idle or paused, a full pulse while focusing, and a stretching figure during a break (dimmed until the break starts). Hover for the phase, remaining time, and state.
 
 ### Panel
 

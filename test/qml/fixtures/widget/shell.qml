@@ -136,7 +136,7 @@ ShellRoot {
       root.check(root.widget.tooltipText.indexOf("Deep Focus") >= 0, "tooltip names the phase")
       root.check(root.widget.tooltipText.indexOf("01:30") >= 0, "tooltip carries the countdown")
       root.check(root.widget.tooltipText.indexOf("Running") >= 0, "tooltip carries the state")
-      root.check(root.widget.glyph === "\u{f08c9}", "work phase shows the target glyph")
+      root.check(root.widget.glyph === "\u{f0430}", "work phase shows the pulse glyph")
       root.check(root.widget.active === true, "running session is active")
       try {
         root.widget.open()

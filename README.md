@@ -15,7 +15,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 
 ## Features
 
-- The session length stays visible in the bar in every state, so starting or pausing does not shift neighboring widgets.
+- Icon-only bar widget: a target while focusing, coffee during breaks, and pause when paused; hover it for the remaining time and state.
 - Panel with session type, progress, start/pause, and reset.
 - Choosing a session type while a timer is running queues it for the next focus block without interrupting the current one.
 - Skip a break from the panel to start the next focus block early.

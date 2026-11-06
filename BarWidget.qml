@@ -27,29 +27,9 @@ BarWidget {
   readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Focus")
   readonly property string tooltipText: {
     if (!service) return strings.t("widget.tooltip", "Focus timer")
-    if (root.vertical)
-      return root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
-    return root.phaseLabel + " · " + service.statusLabel
+    return root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
   }
   readonly property bool active: service ? service.running : false
-
-  // The bar label uses the same icon+value composition as the first-party
-  // status widgets. The slot is measured from the countdown so the timer
-  // never clips or changes width as the digits change.
-  FontMetrics {
-    id: timeMetrics
-    font.family: root.bar ? root.bar.fontFamily : Style.font.family
-    font.pixelSize: Style.bar.iconFont
-  }
-  // Measure the full session length rather than the ticking value, so the
-  // slot keeps its width when the countdown crosses a digit boundary.
-  readonly property string slotTimeText: service
-    ? FocusModel.formatClock(service.totalMs, Commons.I18n.formatNumber)
-    : root.timeText
-  readonly property real timeWidth: timeMetrics.advanceWidth(root.slotTimeText)
-  readonly property real buttonSlot: Math.max(
-    Style.bar.iconSlot * 2,
-    Math.ceil(root.timeWidth) + Style.bar.iconCanvas + Style.space(8))
 
   function resolveService() {
     if (root.service) return
@@ -148,8 +128,6 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     text: root.glyph
-    labelText: root.vertical ? "" : root.timeText
-    slotSize: root.vertical ? Style.bar.iconSlot : root.buttonSlot
     tooltipText: root.tooltipText
     active: root.active
 

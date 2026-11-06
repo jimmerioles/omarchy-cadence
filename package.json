@@ -1,7 +1,7 @@
 {
   "name": "omarchy-focus",
   "private": true,
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
   "engines": {
     "node": ">=20"

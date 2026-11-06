@@ -174,8 +174,8 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
 8. If the plugin is listed on the Omarchy marketplace, update the listing after
    the tag is live.
 
-`v2.0.0` (2026-11-06) is the first tagged release. Earlier version bumps only
-changed `manifest.json` and `package.json`; they were never tagged.
+`v1.0.0` (2026-11-06) is the first tagged release. The 1.x version numbers in
+earlier commits were development iterations and were never tagged.
 
 ## Reporting bugs
 

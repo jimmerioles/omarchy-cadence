@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "jimmerioles.focus",
   "name": "Focus",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "author": "Jim Merioles",
   "license": "MIT",
   "description": "Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",

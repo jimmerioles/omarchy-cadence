@@ -25,7 +25,7 @@ omarchy plugin update jimmerioles.focus
 omarchy plugin remove jimmerioles.focus
 ```
 
-Releases are tagged `vX.Y.Z`; [v2.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v2.0.0)
+Releases are tagged `vX.Y.Z`; [v1.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v1.0.0)
 is the first. The installer and `omarchy plugin update` follow the default
 branch (`master`), not tags.
 

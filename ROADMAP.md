@@ -9,12 +9,12 @@ This file is the public direction for the plugin: what we intend to build, in
 what order, and what we deliberately will not build. It is directional, not a
 promise of dates.
 
-- Current release: `2.0.0` — first tagged release ([v2.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v2.0.0))
-- Next release: `2.1.0 — Focus Guard`
+- Current release: `1.0.0` — first tagged release ([v1.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v1.0.0))
+- Next release: `1.1.0 — Focus Guard`
 
 ## Release history
 
-- `v2.0.0` (2026-11-06) — first tagged release. Deep Focus and Short Focus sessions, DND ownership, notification replay, persisted state, keyboard navigation, and the public roadmap.
+- `v1.0.0` (2026-11-06) — first tagged release. Deep Focus and Short Focus sessions, DND ownership, notification replay, persisted state, keyboard navigation, and the public roadmap.
 
 ## Design principles
 
@@ -34,7 +34,7 @@ promise of dates.
 
 ## Shipped
 
-### 2.0.0 — Focus timer
+### 1.0.0 — Focus timer
 
 - Deep Focus (ultradian) and Short Focus (Pomodoro) sessions.
 - Automatic breaks, pause/resume/reset, skip break.
@@ -47,7 +47,7 @@ promise of dates.
 
 ## Next
 
-### 2.1.0 — Focus Guard
+### 1.1.0 — Focus Guard
 
 The goal is to close the gap between "the timer is running" and "I am actually
 working on the goal." Gentle nudges only; no enforcement.
@@ -98,7 +98,7 @@ working on the goal." Gentle nudges only; no enforcement.
 - **Settings.** Manifest/CLI settings for guard on/off, app list, title
   keywords, delay, and grace. A small guard toggle in the panel.
 
-#### Out of scope for 2.1
+#### Out of scope for 1.1
 
 - Strict allowlist or full-screen blocking.
 - Built-in website, DNS, or hosts blocking.
@@ -133,7 +133,7 @@ working on the goal." Gentle nudges only; no enforcement.
 ## Backlog
 
 The eight improvement areas from the design pass, kept here so they do not get
-lost. **Next** is committed to 2.1; **Later** is valuable but not scheduled;
+lost. **Next** is committed to 1.1; **Later** is valuable but not scheduled;
 **Not planned** is a deliberate non-goal.
 
 | # | Area | Status | Notes |

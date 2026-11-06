@@ -353,7 +353,7 @@ Item {
 
   function syncFocusDndAfterLoad() {
     if (dndOwned) {
-      if (running && phase === "work") {
+      if (phase === "work" && (running || paused)) {
         Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
       } else {
         dndOwned = false
@@ -367,6 +367,11 @@ Item {
   }
 
   // ---- Notifications ----------------------------------------------------
+  function completionTime() {
+    var locale = Qt.locale(Commons.I18n.formatLocale)
+    return new Date().toLocaleString(locale, locale.timeFormat(Locale.ShortFormat))
+  }
+
   function notifyWorkDone() {
     if (!notifications) return
     var minutes = Commons.I18n.formatNumber(breakMinutes, 0)
@@ -394,7 +399,8 @@ Item {
       extraAction = ["--action", strings.t("notify.startWork", "Start focus"),
                      "omarchy-shell", "jimmerioles.focus", "start"]
     }
-    sendNotification(strings.t("notify.breakDone", "Break complete"), body, "\u{f117c}", extraAction)
+    sendNotification(strings.t("notify.breakDone", "Break complete · %1").arg(completionTime()),
+                     body, "\u{f117c}", extraAction)
   }
 
   function sendNotification(title, body, glyph, extraAction) {

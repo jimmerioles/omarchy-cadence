@@ -6,8 +6,10 @@ A Pomodoro and ultradian focus timer for the [Omarchy](https://omarchy.org/) bar
 
 Two session types, each with its own recovery break:
 
-- **Deep work** — a 90 minute ultradian focus block, followed by a 20 minute break.
-- **Pomodoro** — a 25 minute focus block, followed by a 5 minute break.
+- **Ultradian** — 90 minutes of deep work, followed by a 20 minute break.
+- **Pomodoro** — 25 minutes of short work, followed by a 5 minute break.
+
+The session buttons choose the method; the panel hero and action button use the work type, so the context stays visible when the button changes from Start to Pause.
 
 The timer lives in a shared Omarchy shell service, so every monitor shows the same countdown and a bar reload does not lose the session. A running session also survives a shell restart: the end time is stored on disk and the timer resumes from that wall-clock deadline.
 
@@ -20,7 +22,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
 - Notifications can open the panel, and start a ready break or focus block.
 - Completed sessions counted for the day.
-- Keyboard controls in the panel: `Space` start/pause, `R` reset, `1` deep work, `2` Pomodoro, `Escape` close.
+- Keyboard controls in the panel: `Space` start/pause, `R` reset, `1` Ultradian, `2` Pomodoro, `Escape` close.
 - Localized strings and theme-aware colors, borders, and spacing.
 
 ## Install
@@ -89,9 +91,9 @@ omarchy bar set jimmerioles.focus notifications true
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `deepMinutes` | `90` | Length of a deep work block. |
-| `pomodoroMinutes` | `25` | Length of a Pomodoro block. |
+| `pomodoroMinutes` | `25` | Length of a short work block. |
 | `deepBreakMinutes` | `20` | Break after deep work. |
-| `shortBreakMinutes` | `5` | Break after a Pomodoro. |
+| `shortBreakMinutes` | `5` | Break after short work. |
 | `autoStartBreak` | `true` | Start the break when work ends. |
 | `autoStartWork` | `false` | Start the next work block when a break ends. |
 | `notifications` | `true` | Send a desktop notification when a phase ends. |

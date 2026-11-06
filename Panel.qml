@@ -53,24 +53,19 @@ Panel {
       ? strings.t("panel.break", "Break")
       : (service.sessionMode === "deep"
         ? strings.t("panel.deep", "Deep work")
-        : strings.t("panel.pomodoro", "Pomodoro"))
+        : strings.t("panel.shortWork", "Short work"))
   readonly property string phaseMeta: {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
     if (root.breakPhase)
-      return strings.t("panel.breakMeta", "%1 minute break").arg(minutes)
+      return strings.t("panel.breakMeta", "%1 min break").arg(minutes)
     return (service.sessionMode === "deep"
-      ? strings.t("panel.deepMeta", "%1 minute ultradian block")
-      : strings.t("panel.pomodoroMeta", "%1 minute pomodoro block")).arg(minutes)
+      ? strings.t("panel.deepMeta", "%1 min deep focus work block")
+      : strings.t("panel.pomodoroMeta", "%1 min short focus work block")).arg(minutes)
   }
-  readonly property string statusLabel: !service
-    ? strings.t("panel.loading", "Loading")
-    : service.running
-      ? strings.t("panel.running", "Running")
-      : (service.paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))
   readonly property string heroMeta: !service
     ? strings.t("panel.unavailable", "Focus service is still loading.")
-    : root.statusLabel + " · " + root.phaseMeta
+    : root.phaseMeta
   readonly property string primaryLabel: !service
     ? strings.t("panel.start", "Start")
     : service.running
@@ -81,7 +76,7 @@ Panel {
           ? strings.t("panel.startBreak", "Start break")
           : (service.sessionMode === "deep"
             ? strings.t("panel.startDeep", "Start deep work")
-            : strings.t("panel.startPomodoro", "Start Pomodoro"))
+            : strings.t("panel.startShortWork", "Start short work"))
   readonly property string secondaryLabel: root.breakPhase
     ? strings.t("panel.skipBreak", "Skip break")
     : strings.t("panel.reset", "Reset")
@@ -91,11 +86,15 @@ Panel {
   readonly property var modeOptions: [
     {
       value: "deep",
-      label: strings.t("panel.deepChip", "Deep work · %1 min").arg(numberText(service ? service.deepMinutes : 90))
+      label: strings.t("panel.ultradian", "Ultradian"),
+      tooltip: strings.t("panel.ultradianHint", "%1 minute deep work block")
+        .arg(numberText(service ? service.deepMinutes : 90))
     },
     {
       value: "pomodoro",
-      label: strings.t("panel.pomodoroChip", "Pomodoro · %1 min").arg(numberText(service ? service.pomodoroMinutes : 25))
+      label: strings.t("panel.pomodoro", "Pomodoro"),
+      tooltip: strings.t("panel.pomodoroHint", "%1 minute short work block")
+        .arg(numberText(service ? service.pomodoroMinutes : 25))
     }
   ]
 
@@ -258,6 +257,7 @@ Panel {
                 required property var modelData
                 width: (modeRow.width - modeRow.spacing) / 2
                 text: modelData.label
+                tooltipText: modelData.tooltip
                 active: root.service
                   ? root.service.mode === modelData.value
                   : modelData.value === "deep"

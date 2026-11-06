@@ -17,7 +17,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 
 - Icon-only bar widget: a target while focusing, coffee during breaks, and pause when paused; hover it for the remaining time and state.
 - Panel with session type, progress, start/pause, and reset.
-- Choosing a session type while a timer is running queues it for the next focus block without interrupting the current one.
+- The session type is locked while a work block is running, so a stray click cannot change the current session.
 - Skip a break from the panel to start the next focus block early.
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
 - Notifications can open the panel, and start a ready break or focus block.
@@ -51,7 +51,7 @@ omarchy plugin update jimmerioles.focus
 - **Right click**: start or pause.
 - **Middle click**: reset the current session.
 
-While a session is running, picking a session type queues it for the next focus block; the current timer keeps its original length and break. Reset applies the queued type immediately.
+While a work block is running, the session type is locked. Pause the block or wait for the break to choose the next focus type. During a break, the buttons choose what comes next without changing the break; Reset applies a queued type immediately.
 
 During a break the secondary button becomes **Skip break**; select it and press `Enter` or `Space` to return to a ready focus block.
 

@@ -36,8 +36,11 @@ Panel {
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
   readonly property bool breakPhase: service ? service.phase === "break" : false
+  readonly property bool modeLocked: service
+    ? (service.phase === "work" && service.running)
+    : false
   readonly property bool choosingNext: service
-    ? (service.phase === "break" || service.running || service.paused)
+    ? (service.phase === "break" || (service.phase === "work" && service.paused))
     : false
   readonly property string sessionTypeLabel: root.choosingNext
     ? strings.t("panel.nextSession", "Next session")
@@ -45,6 +48,9 @@ Panel {
   readonly property bool queuedModeDiffers: service
     ? service.mode !== service.sessionMode
     : false
+  readonly property string modeHint: root.modeLocked
+    ? strings.t("panel.modeLocked", "Pause to change the next session type.")
+    : (root.queuedModeDiffers ? strings.t("panel.nextHint", "Applies to the next focus session.") : "")
   readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
@@ -107,6 +113,7 @@ Panel {
   }
 
   function selectMode(value) {
+    if (root.modeLocked) return
     if (service) service.selectMode(value)
     root.modeIndex = value === "pomodoro" ? 1 : 0
   }
@@ -152,13 +159,14 @@ Panel {
       else if (dy > 0) focusSection = "transport"
     } else {
       if (dx !== 0) transportIndex = Math.max(0, Math.min(1, transportIndex + dx))
-      else if (dy < 0) focusSection = "mode"
+      else if (dy < 0 && !root.modeLocked) focusSection = "mode"
     }
   }
 
   function activateCursor() {
     cursorActive = true
     if (focusSection === "mode") {
+      if (root.modeLocked) return
       var option = modeOptions[modeIndex]
       if (option) selectMode(option.value)
     } else if (transportIndex === 0) {
@@ -169,6 +177,7 @@ Panel {
   }
 
   onOpenedChanged: if (opened) resetCursor()
+  onModeLockedChanged: if (modeLocked && focusSection === "mode") focusSection = "transport"
 
   KeyboardPanel {
     id: panel
@@ -303,6 +312,7 @@ Panel {
             id: modeRow
             width: parent.width
             spacing: Style.space(6)
+            opacity: root.modeLocked ? 0.45 : 1
 
             Repeater {
               model: root.modeOptions
@@ -316,6 +326,7 @@ Panel {
                 active: root.service
                   ? root.service.mode === modelData.value
                   : modelData.value === "deep"
+                enabled: !root.modeLocked
                 hasCursor: root.cursorActive && root.focusSection === "mode" && root.modeIndex === index
                 bordered: true
                 fontSize: Style.font.bodySmall
@@ -331,9 +342,9 @@ Panel {
           }
 
           Text {
-            visible: root.queuedModeDiffers
+            visible: root.modeHint !== ""
             width: parent.width
-            text: strings.t("panel.nextHint", "Applies to the next focus session.")
+            text: root.modeHint
             textFormat: Text.PlainText
             color: root.contentForeground
             opacity: 0.6

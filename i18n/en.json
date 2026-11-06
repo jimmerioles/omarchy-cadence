@@ -22,6 +22,7 @@
   "panel.sessionType": "Session type",
   "panel.nextSession": "Next session",
   "panel.nextHint": "Applies to the next focus session.",
+  "panel.modeLocked": "Pause to change the next session type.",
   "panel.ultradianHint": "%1 minute deep focus block",
   "panel.pomodoroHint": "%1 minute short focus block",
   "panel.today": "Today",

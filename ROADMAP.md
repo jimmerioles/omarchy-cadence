@@ -1,16 +1,16 @@
 # Focus Roadmap
 
-Focus is a Pomodoro and ultradian focus timer for the Omarchy bar. It silences
-notifications while a work block is active and is growing into a gentle
-anti-distraction companion that helps you notice when you leave the task and
-return to it.
+Focus is a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the
+Omarchy bar. It silences notifications while a work block is active and is
+growing into a gentle anti-distraction companion that helps you notice when you
+leave the task and return to it.
 
 This file is the public direction for the plugin: what we intend to build, in
 what order, and what we deliberately will not build. It is directional, not a
 promise of dates.
 
-- Current release: `v1.17.0` (shipped)
-- Next release: `v1.18.0 — Focus Guard`
+- Current release: `2.0.0` (shipped)
+- Next release: `2.1.0 — Focus Guard`
 
 ## Design principles
 
@@ -30,7 +30,7 @@ promise of dates.
 
 ## Shipped
 
-### v1.17.0 — Focus timer
+### 2.0.0 — Focus timer
 
 - Deep Focus (ultradian) and Short Focus (Pomodoro) sessions.
 - Automatic breaks, pause/resume/reset, skip break.
@@ -39,11 +39,11 @@ promise of dates.
 - Notification replay at the break.
 - Persisted timer state and restart recovery.
 - Daily completed-session count.
-- IPC control, keyboard navigation, localization, and theme-aware UI.
+- IPC control, keyboard navigation, translation-ready strings, and theme-aware UI.
 
 ## Next
 
-### v1.18.0 — Focus Guard
+### 2.1.0 — Focus Guard
 
 The goal is to close the gap between "the timer is running" and "I am actually
 working on the goal." Gentle nudges only; no enforcement.
@@ -94,7 +94,7 @@ working on the goal." Gentle nudges only; no enforcement.
 - **Settings.** Manifest/CLI settings for guard on/off, app list, title
   keywords, delay, and grace. A small guard toggle in the panel.
 
-#### Out of scope for v1.18
+#### Out of scope for 2.1
 
 - Strict allowlist or full-screen blocking.
 - Built-in website, DNS, or hosts blocking.
@@ -129,7 +129,7 @@ working on the goal." Gentle nudges only; no enforcement.
 ## Backlog
 
 The eight improvement areas from the design pass, kept here so they do not get
-lost. **Next** is committed to v1.18; **Later** is valuable but not scheduled;
+lost. **Next** is committed to 2.1; **Later** is valuable but not scheduled;
 **Not planned** is a deliberate non-goal.
 
 | # | Area | Status | Notes |

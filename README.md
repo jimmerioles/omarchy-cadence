@@ -1,216 +1,170 @@
 # Focus
 
-A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar, using the Ultradian and Pomodoro methods.
+A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to protect a work block, hand you back a real break, and stay out of the way.
 
-![Focus panel](assets/focus-panel.png)
+[![Tests](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml/badge.svg)](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml)
+[![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-3da639)](LICENSE)
 
-Two session types, each with its own recovery break:
+![Focus demo](assets/focus-demo.gif)
 
-- **Deep Focus** (Ultradian method) — 90 minutes of work, followed by a 20 minute break.
-- **Short Focus** (Pomodoro method) — 25 minutes of work, followed by a 5 minute break.
+## Why Focus
 
-The session buttons choose the session type; their tooltips name the underlying method. The panel hero and action button keep the session type visible when the button changes from Start to Pause.
-
-The timer lives in a shared Omarchy shell service, so every monitor shows the same countdown and a bar reload does not lose the session. A running session also survives a shell restart: the end time is stored on disk and the timer resumes from that wall-clock deadline.
-
-## Vocabulary
-
-- **Session type** — Deep Focus or Short Focus, chosen in the panel.
-- **Method** — Ultradian or Pomodoro, the rhythm or technique behind a session type.
-- **Mode** — the session type selected for the next work block; settings and IPC use `deep` or `short`.
-
-## Features
-
-- Icon-only bar widget: a dimmed target when idle or paused, a full target while focusing, and a stretching figure during breaks; hover it for the remaining time and state.
-- Panel with session type, progress, start/pause, and reset.
-- The session type is locked while a work block is running, so a stray click cannot change the current session.
-- Session buttons show their configured lengths (`Deep Focus · 90 min`, `Short Focus · 25 min`), so both options stay comparable while queueing the next block. Tooltips name the Ultradian and Pomodoro methods, explain what each is best for, and give concrete examples; they appear on both hover and keyboard focus.
-- While a session is active, the session-type header shows the upcoming sequence on its right: the break and next session type during work, or just the next session type during a break.
-- Skip a break from the panel to return to a ready focus block early.
-- Automatic breaks (configurable) and desktop notifications when a phase ends.
-- Silences desktop notifications while a work block is active, then restores DND and replays Omarchy's notification history when the break begins.
-- Leaves a Do Not Disturb setting you enabled yourself untouched.
-- Notifications can open the panel, and start a ready break or focus block.
-- Completed sessions counted for the day.
-- Keyboard navigation in the panel: arrow keys or `j`/`k` move between rows, `h`/`l` move between buttons, `Enter`/`Space` activate, and `Escape` closes.
-- Localized strings and theme-aware colors, borders, and spacing.
-
-## Requirements
-
-An Omarchy install with the Quickshell shell and its notifications service.
+- **Two rhythms.** Deep Focus follows the Ultradian 90/20 rhythm; Short Focus follows Pomodoro 25/5. Both are configurable.
+- **Breaks that happen.** Breaks can start automatically, notifications mark each transition, and focus notifications are quiet while you work.
+- **One timer everywhere.** A shared shell service keeps every monitor in sync, survives bar reloads, and resumes a running block after a shell restart.
+- **Local only.** No accounts, telemetry, or network calls; timer state stays in a private local file.
+- **Mouse or keyboard.** Left, right, and middle click on the bar; full keyboard navigation in the panel.
 
 ## Install
+
+**Requirements:** Omarchy 4.5+ (Quattro), tested against 4.5.0, with its notifications service.
 
 ```bash
 omarchy plugin add https://github.com/jimmerioles/omarchy-focus.git --enable
 ```
 
-Omarchy will validate the manifest and enable the widget. The widget installs into the middle section; to put it at the right edge of that section:
+Omarchy validates the manifest and enables the widget. When the install runs interactively, it asks where to place the widget; the default is the right edge of the center group (`centerEnd`). Move it later with:
 
 ```bash
-omarchy bar move jimmerioles.focus --section centerEnd --after omarchy.system-update
+omarchy bar move jimmerioles.focus --section centerEnd
 ```
 
-Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
-
-Update the plugin later with:
+Update:
 
 ```bash
 omarchy plugin update jimmerioles.focus
 ```
 
-## Usage
-
-- **Left click** the bar widget: open the timer panel.
-- **Right click**: start or pause.
-- **Middle click**: reset the current session.
-
-While a work block is running, the session type is locked. Pause the block or wait for the break to choose the next session type. During a break, the buttons choose what comes next without changing the break.
-
-While a work block is paused, **Reset** applies the queued session type immediately. During a break, **Reset** restarts the break instead.
-
-During a break the secondary button becomes **Skip break**; select it and press `Enter` or `Space` to return to a ready focus block.
-
-The panel also exposes its controls over IPC:
-
-```bash
-omarchy-shell jimmerioles.focus status
-omarchy-shell jimmerioles.focus start
-omarchy-shell jimmerioles.focus pause
-omarchy-shell jimmerioles.focus toggleTimer
-omarchy-shell jimmerioles.focus reset
-omarchy-shell jimmerioles.focus skipBreak
-omarchy-shell jimmerioles.focus setMode deep
-omarchy-shell jimmerioles.focus setMode short
-omarchy-shell jimmerioles.focus startMode deep
-omarchy-shell jimmerioles.focus startMode short
-omarchy-shell jimmerioles.focus open
-omarchy-shell jimmerioles.focus close
-```
-
-`status` returns JSON with the selected and current mode, phase, paused/running state, remaining milliseconds, progress, and today's completed session count. The `mode` and `sessionMode` values are `deep` or `short`.
-
-### Notifications and DND
-
-While a work block is active—including pauses—Focus enables Omarchy's Do Not Disturb. When the work block ends, Focus restores the previous DND state if it was the one that enabled DND. A DND you set yourself is left on, and Focus does not replay history in that case.
-
-At the break, Focus invokes Omarchy's existing notification-history replay. It shows the shell's recent history (the latest six cards), not a focus-only list, so it can include older or unrelated notifications. Invoking history again replays the same cards again.
-
-Focus completion notifications include their local send time, so separate runs remain distinguishable when history is replayed.
-
-Focus's own completion notifications are sent after DND is restored. If you want a strict focus-only review, the native replay is not filtered; a dedicated digest or list would be needed.
-
-## Keybindings
-
-One shortcut opens the panel. This key is free in stock Omarchy:
-
-```lua
-o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
-```
-
-If you prefer `SUPER + CTRL + ALT + F`, use `o.rebind` instead. It replaces the stock **Toggle full screen desktop** binding:
-
-```lua
-o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
-```
-
-The panel uses the same shell toggle path as the first-party panels, so it opens on the focused monitor. Once open, everything is keyboard navigation:
-
-- `↑` / `↓` or `j` / `k` move between the session-type row and the transport row.
-- `←` / `→` or `h` / `l` move between the two buttons in the current row.
-- `Enter` or `Space` activates the focused button.
-- `Tab` / `Shift + Tab` switch to another bar panel.
-- `Escape` closes the panel.
-
-## Settings
-
-Settings are stored on the widget's entry in `~/.config/omarchy/shell.json`. They are currently configured with the CLI; the timer panel does not have a settings view.
-
-```bash
-omarchy bar set jimmerioles.focus deepMinutes 90
-omarchy bar set jimmerioles.focus shortMinutes 25
-omarchy bar set jimmerioles.focus deepBreakMinutes 20
-omarchy bar set jimmerioles.focus shortBreakMinutes 5
-omarchy bar set jimmerioles.focus autoStartBreak true
-omarchy bar set jimmerioles.focus autoStartWork false
-omarchy bar set jimmerioles.focus notifications true
-```
-
-| Setting | Default | Meaning |
-| --- | --- | --- |
-| `deepMinutes` | `90` | Length of a Deep Focus block. |
-| `shortMinutes` | `25` | Length of a Short Focus block. |
-| `deepBreakMinutes` | `20` | Break after Deep Focus. |
-| `shortBreakMinutes` | `5` | Break after Short Focus. |
-| `autoStartBreak` | `true` | Start the break when work ends. |
-| `autoStartWork` | `false` | Start the next work block when a break ends. |
-| `notifications` | `true` | Send Focus completion notifications. DND behavior is separate. |
-
-Changing a duration while a session is running does not alter that session; the new length applies to the next one.
-
-## State
-
-The timer state is kept in:
-
-```text
-~/.local/state/omarchy/focus/state.json
-```
-
-The directory is private to the user and the file is written atomically. A session that ends while the shell is down is completed silently, so the next phase is ready without a stale notification at login. DND ownership is persisted so a shell restart cannot strand DND on.
-
-## Uninstall
+Uninstall:
 
 ```bash
 omarchy plugin remove jimmerioles.focus
 ```
 
+Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
+
+## Use
+
+### Bar
+
+| Action | What it does |
+| --- | --- |
+| Left click | Open or close the Focus panel. |
+| Right click | Start or pause the current block. |
+| Middle click | Reset the current block. |
+
+The icon is a dimmed target when focus is idle or paused, a full target while focusing, and a stretching figure during a break (dimmed until the break starts). Hover for the phase, remaining time, and state.
+
+### Panel
+
+The panel shows the current phase, countdown, progress, and today's completed focus blocks. Start, pause, resume, reset, or skip a break from the transport row. Choose Deep Focus or Short Focus for the next work block; the buttons show the configured lengths.
+
+- While a focus block is **running**, the session type is locked. A stray click cannot change the current block.
+- While a focus block is **paused**, choosing a session type queues it; **Reset** applies it immediately.
+- During a **break**, the buttons choose what comes next without changing the break. **Reset** restarts the break; **Skip break** returns to a ready focus block.
+
+### Keyboard
+
+Add this binding to `~/.config/hypr/bindings.lua`:
+
+```lua
+o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
+```
+
+`SUPER + ALT + O` is free in stock Omarchy. If you prefer `SUPER + CTRL + ALT + F`, use `o.rebind`; it replaces the stock **Toggle full screen desktop** binding:
+
+```lua
+o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
+```
+
+Hyprland reloads Lua bindings on save. To apply and validate manually:
+
+```bash
+hyprctl reload
+hyprctl configerrors
+```
+
+Once the panel is open:
+
+| Key | Action |
+| --- | --- |
+| `↑` / `↓` or `j` / `k` | Move between the session-type and transport rows. |
+| `←` / `→` or `h` / `l` | Move between buttons in the current row. |
+| `Enter` / `Space` | Activate the focused button. |
+| `Tab` / `Shift + Tab` | Switch to another bar panel. |
+| `Escape` | Close the panel. |
+
+### Notifications and DND
+
+While a focus block is active—including pauses—Focus turns on Do Not Disturb if it was off. At the break it restores the DND state it changed and asks Omarchy to replay recent notifications. A DND you turned on yourself is left alone.
+
+The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. Focus completion notifications are sent after DND is restored and include their local send time.
+
+See [Notifications and DND](docs/usage.md#notifications-and-dnd) for the full behavior.
+
+## Configure
+
+Defaults:
+
+| Session type | Focus block | Break |
+| --- | --- | --- |
+| Deep Focus (Ultradian) | 90 minutes | 20 minutes |
+| Short Focus (Pomodoro) | 25 minutes | 5 minutes |
+
+Breaks start automatically; the next focus block waits for you. Completion notifications are on.
+
+```bash
+omarchy bar set jimmerioles.focus deepMinutes 90
+omarchy bar set jimmerioles.focus shortMinutes 25
+omarchy bar set jimmerioles.focus autoStartBreak true
+omarchy bar set jimmerioles.focus notifications true
+```
+
+Settings live on the widget entry in `~/.config/omarchy/shell.json`. A running or paused block keeps its original length; a new length applies to the next phase. See the [settings reference](docs/reference.md#settings) for every key, range, and step.
+
+## Command line
+
+```bash
+omarchy-shell jimmerioles.focus status
+omarchy-shell jimmerioles.focus start
+omarchy-shell jimmerioles.focus startMode short
+omarchy-shell jimmerioles.focus skipBreak
+```
+
+`status` returns JSON with the selected and current mode, phase, run state, remaining time, progress, and today's completed focus blocks. See the [IPC reference](docs/reference.md#ipc) for all methods and the response schema.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| The widget is missing | `omarchy plugin list`, then `omarchy plugin enable jimmerioles.focus`. |
+| The panel shortcut does nothing | The binding in `~/.config/hypr/bindings.lua`; run `hyprctl reload` and `hyprctl configerrors`. |
+| The panel says “Focus service is still loading” | Wait a moment after shell startup, or run `omarchy restart shell`. |
+| Notifications are quiet | Check the `notifications` setting and whether Do Not Disturb is still on. |
+| DND is still on after a block | Focus only clears DND it enabled. Turn off DND manually if you enabled it yourself. |
+| The timer needs a clean slate | `omarchy plugin disable jimmerioles.focus`, delete `~/.local/state/omarchy/focus/state.json`, then `omarchy plugin enable jimmerioles.focus`. |
+
+More in [Troubleshooting](docs/usage.md#troubleshooting).
+
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for what is shipped, what is next, and what is
-deliberately out of scope.
+See [ROADMAP.md](ROADMAP.md) for what is shipped, what is next, and what is deliberately out of scope.
 
 ## Development
 
-The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, with a `bar-widget` entry point and a `service` entry point.
-
-The timer rules live in `FocusModel.js` as pure functions. `Service.qml` owns only the QML properties, timers, disk I/O, notifications, and other side effects. That keeps the state machine testable from Node and keeps QML changes away from timer logic.
-
-Validate a checkout before installing it:
+The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, a `bar-widget` entry point, and a `service` entry point. Timer rules live in `FocusModel.js` as pure functions; `Service.qml` owns QML state, timers, disk I/O, notifications, and other effects.
 
 ```bash
-omarchy plugin validate .
+npm test
+npm run validate
+npm run lint:qml
+npm run test:qml
 ```
 
-### Testing
+`npm test` needs Node 20 or newer. The QML checks run on an Omarchy machine with `quickshell`, `jq`, and an Omarchy checkout at `OMARCHY_PATH` (defaults to `/usr/share/omarchy`); they do not need a compositor and never touch live timer state.
 
-Run the fast suite:
-
-```bash
-node --test test/*.test.js
-```
-
-It covers the timer model (parsing, clamping, clock formatting, every session transition, DND ownership, persistence, and status), the manifest contract, translation keys, and the private state-file setup. It needs only Node 20 or newer.
-
-Run the QML checks on an Omarchy machine:
-
-```bash
-bash test/qml/lint.sh
-bash test/qml/run.sh
-```
-
-`lint.sh` runs `qmllint` against the installed Omarchy shell imports. `run.sh` starts Quickshell on the offscreen platform and drives the real `Service.qml`, `BarWidget.qml`, and restart/corrupt-state paths with stubbed Omarchy commands. It needs `quickshell`, `jq`, and an Omarchy checkout at `OMARCHY_PATH` (defaults to `/usr/share/omarchy`); it does not need a compositor and never touches the live timer state.
-
-Before publishing, also check the panel by hand on the target desktop:
-
-- left click opens the panel, `Escape` closes it
-- start, pause, resume, reset, and skip break behave as documented
-- the mode row locks while a work block runs
-- DND turns on for work and off at the break; a DND you set yourself stays on
-- the completion notification's actions open the panel and start the next block
-- restarting the shell mid-session resumes the countdown
-- disabling and re-enabling the plugin, then removing it, leaves the shell clean
-
-The GitHub workflow runs the Node suite on Ubuntu and the QML lint and headless fixtures in an Arch container against a pinned Omarchy release.
+See [docs/architecture.md](docs/architecture.md) for the runtime design and [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and release steps.
 
 ## License
 

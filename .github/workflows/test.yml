@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   unit:
-    name: Model, manifest, and i18n
+    name: Model, manifest, docs, and i18n
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

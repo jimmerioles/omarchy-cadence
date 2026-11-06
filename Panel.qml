@@ -53,6 +53,12 @@ Panel {
       ? strings.t("panel.pomodoro", "Pomodoro")
       : strings.t("panel.ultradian", "Ultradian"))
     : ""
+  readonly property string nextIndicatorText: !service
+    ? ""
+    : root.breakPhase
+      ? strings.t("panel.nextFocus", "Next: %1").arg(root.nextModeLabel)
+      : strings.t("panel.nextAfterBreak", "Next: %1 min break → %2")
+          .arg(numberText(service.breakMinutes)).arg(root.nextModeLabel)
   readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
@@ -319,7 +325,10 @@ Panel {
               id: nextModeText
               visible: root.showNextMode && root.nextModeLabel !== ""
               textFormat: Text.PlainText
-              text: strings.t("panel.nextMode", "Next: %1").arg(root.nextModeLabel)
+              text: root.nextIndicatorText
+              width: Math.max(0, parent.width - sectionHeader.implicitWidth - Style.space(8))
+              horizontalAlignment: Text.AlignRight
+              elide: Text.ElideRight
               color: root.contentForeground
               opacity: 0.6
               font.family: root.contentFontFamily

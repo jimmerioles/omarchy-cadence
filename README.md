@@ -43,6 +43,10 @@ Uninstall:
 omarchy plugin remove jimmerioles.focus
 ```
 
+### Releases
+
+Releases are tagged `vMAJOR.MINOR.PATCH`; the first is [v2.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v2.0.0). Tags mark stable snapshots for pinning or auditing, while the installer and `omarchy plugin update` track the default branch (`master`).
+
 Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
 
 ## Use

@@ -25,6 +25,10 @@ omarchy plugin update jimmerioles.focus
 omarchy plugin remove jimmerioles.focus
 ```
 
+Releases are tagged `vX.Y.Z`; [v2.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v2.0.0)
+is the first. The installer and `omarchy plugin update` follow the default
+branch (`master`), not tags.
+
 `omarchy plugin add --enable` validates the manifest, clones the repository into
 `~/.config/omarchy/plugins/jimmerioles.focus`, and, when run interactively, asks
 where to place the widget. The manifest default is `centerEnd`, the right edge

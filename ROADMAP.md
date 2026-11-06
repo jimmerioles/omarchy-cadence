@@ -9,8 +9,12 @@ This file is the public direction for the plugin: what we intend to build, in
 what order, and what we deliberately will not build. It is directional, not a
 promise of dates.
 
-- Current release: `2.0.0` (shipped)
+- Current release: `2.0.0` — first tagged release ([v2.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v2.0.0))
 - Next release: `2.1.0 — Focus Guard`
+
+## Release history
+
+- `v2.0.0` (2026-11-06) — first tagged release. Deep Focus and Short Focus sessions, DND ownership, notification replay, persisted state, keyboard navigation, and the public roadmap.
 
 ## Design principles
 

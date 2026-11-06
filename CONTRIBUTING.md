@@ -158,8 +158,24 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
    npm run test:qml
    ```
 
-6. Commit, tag `vX.Y.Z`, and push. If the plugin is listed on the Omarchy
-   marketplace, update the listing after the tag is live.
+6. Commit the release, then create and push an annotated tag:
+
+   ```bash
+   git tag -a vX.Y.Z -m "Focus X.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+7. Publish a GitHub release from that tag:
+
+   ```bash
+   gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
+   ```
+
+8. If the plugin is listed on the Omarchy marketplace, update the listing after
+   the tag is live.
+
+`v2.0.0` (2026-11-06) is the first tagged release. Earlier version bumps only
+changed `manifest.json` and `package.json`; they were never tagged.
 
 ## Reporting bugs
 

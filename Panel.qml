@@ -45,12 +45,6 @@ Panel {
   readonly property string sessionTypeLabel: root.choosingNext
     ? strings.t("panel.nextSession", "Next session")
     : strings.t("panel.sessionType", "Session type")
-  readonly property bool queuedModeDiffers: service
-    ? service.mode !== service.sessionMode
-    : false
-  readonly property string modeHint: root.modeLocked
-    ? strings.t("panel.modeLocked", "Pause to change the next session type.")
-    : (root.queuedModeDiffers ? strings.t("panel.nextHint", "Applies to the next focus session.") : "")
   readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
@@ -339,18 +333,6 @@ Panel {
                 onHovered: function(hovered) { if (hovered) root.pointAtMode(index) }
               }
             }
-          }
-
-          Text {
-            visible: root.modeHint !== ""
-            width: parent.width
-            text: root.modeHint
-            textFormat: Text.PlainText
-            color: root.contentForeground
-            opacity: 0.6
-            font.family: root.contentFontFamily
-            font.pixelSize: Style.font.caption
-            wrapMode: Text.Wrap
           }
         }
 

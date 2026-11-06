@@ -295,7 +295,7 @@ Item {
       extraAction = ["--action", strings.t("notify.startBreak", "Start break"),
                      "omarchy-shell", "jimmerioles.focus", "start"]
     }
-    sendNotification(title, body, "\u{f051b}", extraAction)
+    sendNotification(title, body, "\u{f08c9}", extraAction)
   }
 
   function notifyBreakDone() {

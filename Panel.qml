@@ -45,7 +45,7 @@ Panel {
   readonly property bool queuedModeDiffers: service
     ? service.mode !== service.sessionMode
     : false
-  readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f051b}"
+  readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
     ? strings.t("widget.name", "Focus")

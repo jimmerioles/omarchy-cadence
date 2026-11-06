@@ -1,0 +1,15 @@
+{
+  "name": "omarchy-focus",
+  "private": true,
+  "version": "1.17.0",
+  "description": "Pomodoro and ultradian focus timer for the Omarchy bar.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "test:qml": "bash test/qml/run.sh",
+    "lint:qml": "bash test/qml/lint.sh",
+    "validate": "omarchy plugin validate ."
+  }
+}

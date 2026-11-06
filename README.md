@@ -162,11 +162,44 @@ omarchy plugin remove jimmerioles.focus
 
 The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, with a `bar-widget` entry point and a `service` entry point.
 
+The timer rules live in `FocusModel.js` as pure functions. `Service.qml` owns only the QML properties, timers, disk I/O, notifications, and other side effects. That keeps the state machine testable from Node and keeps QML changes away from timer logic.
+
 Validate a checkout before installing it:
 
 ```bash
 omarchy plugin validate .
 ```
+
+### Testing
+
+Run the fast suite:
+
+```bash
+node --test test/*.test.js
+```
+
+It covers the timer model (parsing, clamping, clock formatting, every session transition, DND ownership, persistence, and status), the manifest contract, translation keys, and the private state-file setup. It needs only Node 20 or newer.
+
+Run the QML checks on an Omarchy machine:
+
+```bash
+bash test/qml/lint.sh
+bash test/qml/run.sh
+```
+
+`lint.sh` runs `qmllint` against the installed Omarchy shell imports. `run.sh` starts Quickshell on the offscreen platform and drives the real `Service.qml`, `BarWidget.qml`, and restart/corrupt-state paths with stubbed Omarchy commands. It needs `quickshell`, `jq`, and an Omarchy checkout at `OMARCHY_PATH` (defaults to `/usr/share/omarchy`); it does not need a compositor and never touches the live timer state.
+
+Before publishing, also check the panel by hand on the target desktop:
+
+- left click opens the panel, `Escape` closes it
+- start, pause, resume, reset, and skip break behave as documented
+- the mode row locks while a work block runs
+- DND turns on for work and off at the break; a DND you set yourself stays on
+- the completion notification's actions open the panel and start the next block
+- restarting the shell mid-session resumes the countdown
+- disabling and re-enabling the plugin, then removing it, leaves the shell clean
+
+The GitHub workflow runs the Node suite on Ubuntu and the QML lint and headless fixtures in an Arch container against a pinned Omarchy release.
 
 ## License
 

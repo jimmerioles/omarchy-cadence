@@ -1,0 +1,61 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Model, manifest, and i18n
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: node --check FocusModel.js
+      - name: Unit tests
+        run: node --test test/*.test.js
+
+  qml:
+    name: QML lint and headless fixtures
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: archlinux:base-devel
+    env:
+      # The shell contract this plugin targets. Bump deliberately when moving
+      # to a newer Omarchy release.
+      OMARCHY_REF: v4.5.0
+    steps:
+      - name: Install the QML toolchain
+        run: pacman -Syu --noconfirm git jq nodejs quickshell
+
+      - uses: actions/checkout@v4
+
+      - name: Check out the Omarchy shell contract
+        run: |
+          git clone --depth 1 --branch "$OMARCHY_REF" https://github.com/omacom/omarchy.git /tmp/omarchy
+
+      - name: Validate the plugin manifest
+        run: bash /tmp/omarchy/bin/omarchy-plugin-validate .
+
+      - name: Lint QML
+        env:
+          OMARCHY_PATH: /tmp/omarchy
+          REQUIRE_QMLLINT: "1"
+        run: bash test/qml/lint.sh
+
+      - name: Run headless QML fixtures
+        env:
+          OMARCHY_PATH: /tmp/omarchy
+          REQUIRE_QML: "1"
+        run: bash test/qml/run.sh

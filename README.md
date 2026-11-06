@@ -81,11 +81,11 @@ Notifications can be clicked to open the panel. When a break or work block is re
 Add one shortcut to open the panel:
 
 ```lua
--- Focus timer
-o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
+-- Focus timer (replaces the stock Toggle full screen desktop binding)
+o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
 ```
 
-The panel uses the same shell toggle path as the first-party panels, so it opens on the focused monitor. Once open, everything is keyboard navigation:
+This takes over `SUPER + CTRL + ALT + F` from **Toggle full screen desktop**. The panel uses the same shell toggle path as the first-party panels, so it opens on the focused monitor. Once open, everything is keyboard navigation:
 
 - `↑` / `↓` or `j` / `k` move between the session-type row and the transport row.
 - `←` / `→` or `h` / `l` move between the two buttons in the current row.

@@ -164,6 +164,11 @@ The directory is private to the user and the file is written atomically. A sessi
 omarchy plugin remove jimmerioles.focus
 ```
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for what is shipped, what is next, and what is
+deliberately out of scope.
+
 ## Development
 
 The plugin is a standard Omarchy shell plugin: `manifest.json` at the repository root, with a `bar-widget` entry point and a `service` entry point.

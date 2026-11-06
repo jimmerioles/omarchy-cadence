@@ -100,7 +100,7 @@ Panel {
       value: "deep",
       label: strings.t("panel.ultradianChip", "Deep Focus · %1 min")
         .arg(numberText(service ? service.deepMinutes : 90)),
-      tooltip: strings.t("panel.ultradianHint", "Ultradian · best for deep, uninterrupted work — coding, writing, studying")
+      tooltip: strings.t("panel.ultradianHint", "Ultradian · best for deep, uninterrupted work — coding, writing, learning")
     },
     {
       value: "pomodoro",

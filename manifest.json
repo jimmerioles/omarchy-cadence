@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "jimmerioles.focus",
   "name": "Focus",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "author": "Jim Merioles",
   "license": "MIT",
   "description": "Pomodoro and ultradian focus timer with work and break sessions in the Omarchy bar.",

@@ -83,14 +83,14 @@ Add this to `~/.config/hypr/bindings.lua` for a `SUPER + ALT` shortcut family:
 ```lua
 -- Focus timer
 o.bind("SUPER + ALT + T", "Focus timer: start/pause", "omarchy-shell jimmerioles.focus toggleTimer")
-o.bind("SUPER + ALT + O", "Focus timer: open panel", "omarchy-shell jimmerioles.focus toggle")
+o.bind("SUPER + ALT + O", "Focus timer: open panel", { panel = "jimmerioles.focus" })
 o.bind("SUPER + ALT + D", "Focus timer: start deep focus", "omarchy-shell jimmerioles.focus startMode deep")
 o.bind("SUPER + ALT + P", "Focus timer: start Pomodoro", "omarchy-shell jimmerioles.focus startMode pomodoro")
 o.bind("SUPER + ALT + B", "Focus timer: skip break", "omarchy-shell jimmerioles.focus skipBreak")
 o.bind("SUPER + ALT + R", "Focus timer: reset session", "omarchy-shell jimmerioles.focus reset")
 ```
 
-None of these replace a stock Omarchy binding. If a work session is already running, the mode shortcuts queue the chosen mode for the next block rather than interrupting the current session.
+None of these replace a stock Omarchy binding. The panel shortcut uses the shell toggle path, so it opens on the focused monitor like the first-party panels. If a work session is already running, the mode shortcuts queue the chosen mode for the next block rather than interrupting the current session.
 
 ## Settings
 

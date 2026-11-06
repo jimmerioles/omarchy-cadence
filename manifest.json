@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "author": "Jim Merioles",
   "license": "MIT",
-  "description": "Deep Focus and Short Focus timer with Ultradian and Pomodoro methods in the Omarchy bar.",
+  "description": "Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
   "kinds": [
     "bar-widget",
     "service"
@@ -16,7 +16,7 @@
   },
   "barWidget": {
     "displayName": "Focus",
-    "description": "Deep Focus and Short Focus sessions with breaks and desktop notifications.",
+    "description": "Deep Focus and Short Focus sessions with automatic Do Not Disturb, breaks, and notification replay.",
     "category": "Time",
     "allowMultiple": false,
     "defaultSection": "centerEnd",

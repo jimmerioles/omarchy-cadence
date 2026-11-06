@@ -1,6 +1,6 @@
 # Focus
 
-A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to protect a work block, hand you back a real break, and stay out of the way.
+A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to turn on Do Not Disturb while you work, hand you back a real break, and stay out of the way.
 
 [![Tests](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml/badge.svg)](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml)
 [![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
@@ -10,8 +10,9 @@ A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar�
 
 ## Why Focus
 
+- **Focus mode for your desktop.** Start a block and Focus turns on Omarchy's Do Not Disturb—like Focus mode on your phone—and holds it through pauses. At the break, it restores the DND state it changed and replays recent notifications; DND you enabled yourself is left alone.
 - **Two rhythms.** Deep Focus follows the Ultradian 90/20 rhythm; Short Focus follows Pomodoro 25/5. Both are configurable.
-- **Breaks that happen.** Breaks can start automatically, notifications mark each transition, and focus notifications are quiet while you work.
+- **Breaks that happen.** Breaks can start automatically, and notifications mark each transition.
 - **One timer everywhere.** A shared shell service keeps every monitor in sync, survives bar reloads, and resumes a running block after a shell restart.
 - **Local only.** No accounts, telemetry, or network calls; timer state stays in a private local file.
 - **Mouse or keyboard.** Left, right, and middle click on the bar; full keyboard navigation in the panel.

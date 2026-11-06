@@ -58,10 +58,8 @@ Panel {
     if (!service) return ""
     var minutes = numberText(Math.max(1, Math.round(service.totalMs / 60000)))
     if (root.breakPhase)
-      return strings.t("panel.breakMeta", "%1 min break").arg(minutes)
-    return (service.sessionMode === "deep"
-      ? strings.t("panel.deepMeta", "%1 min deep focus work block")
-      : strings.t("panel.pomodoroMeta", "%1 min short focus work block")).arg(minutes)
+      return strings.t("panel.breakMeta", "%1 minute break").arg(minutes)
+    return strings.t("panel.workMeta", "%1 minute work block").arg(minutes)
   }
   readonly property string heroMeta: !service
     ? strings.t("panel.unavailable", "Focus service is still loading.")

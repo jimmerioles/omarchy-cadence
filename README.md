@@ -15,7 +15,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 
 ## Features
 
-- Icon-only bar widget: a target while focusing, coffee during breaks, and pause when paused; hover it for the remaining time and state.
+- Icon-only bar widget: a dimmed target when idle or paused, a full target while focusing, and a stretching figure during breaks; hover it for the remaining time and state.
 - Panel with session type, progress, start/pause, and reset.
 - The session type is locked while a work block is running, so a stray click cannot change the current session.
 - Session buttons show their configured lengths (`Deep Focus · 90 min`, `Short Focus · 25 min`), so both options stay comparable while queueing the next block. Their tooltips name the Ultradian and Pomodoro methods, summarize what each is best for, and append concrete examples; they appear on both hover and keyboard focus.

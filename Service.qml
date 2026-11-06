@@ -394,7 +394,7 @@ Item {
       extraAction = ["--action", strings.t("notify.startWork", "Start focus"),
                      "omarchy-shell", "jimmerioles.focus", "start"]
     }
-    sendNotification(strings.t("notify.breakDone", "Break complete"), body, "\u{f0176}", extraAction)
+    sendNotification(strings.t("notify.breakDone", "Break complete"), body, "\u{f117c}", extraAction)
   }
 
   function sendNotification(title, body, glyph, extraAction) {

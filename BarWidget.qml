@@ -18,9 +18,7 @@ BarWidget {
   }
 
   readonly property bool breakPhase: service ? service.phase === "break" : false
-  readonly property string glyph: service && service.paused
-    ? "\u{f03e4}"
-    : (breakPhase ? "\u{f0176}" : "\u{f08c9}")
+  readonly property string glyph: breakPhase ? "\u{f117c}" : "\u{f08c9}"
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
@@ -131,7 +129,7 @@ BarWidget {
     text: root.glyph
     slotSize: Style.bar.statusSlot
     tooltipText: root.tooltipText
-    active: root.active
+    dimmed: !root.active
 
     onPressed: function(button) {
       if (button === Qt.RightButton) {

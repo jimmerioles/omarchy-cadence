@@ -34,7 +34,7 @@ omarchy plugin add https://github.com/jimmerioles/omarchy-focus.git --enable
 Omarchy will validate the manifest and enable the widget. If it lands somewhere other than you like, move it:
 
 ```bash
-omarchy bar move jimmerioles.focus --section centerEnd --index 0
+omarchy bar move jimmerioles.focus --section centerEnd --after omarchy.system-update
 ```
 
 Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.

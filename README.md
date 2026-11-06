@@ -22,7 +22,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
 - Notifications can open the panel, and start a ready break or focus block.
 - Completed sessions counted for the day.
-- Keyboard controls in the panel: `Space` start/pause, `R` reset, `1` Ultradian, `2` Pomodoro, `Escape` close.
+- Keyboard navigation in the panel: arrow keys or `j`/`k` move between rows, `h`/`l` move between buttons, `Enter`/`Space` activate, and `Escape` closes.
 - Localized strings and theme-aware colors, borders, and spacing.
 
 ## Install
@@ -53,7 +53,7 @@ omarchy plugin update jimmerioles.focus
 
 While a session is running, picking a session type queues it for the next focus block; the current timer keeps its original length and break. Reset applies the queued type immediately.
 
-During a break the secondary button becomes **Skip break**, and `R` skips the break and returns to a ready focus block.
+During a break the secondary button becomes **Skip break**; select it and press `Enter` or `Space` to return to a ready focus block.
 
 The panel also exposes its controls over IPC:
 
@@ -78,19 +78,20 @@ Notifications can be clicked to open the panel. When a break or work block is re
 
 ## Keybindings
 
-Add this to `~/.config/hypr/bindings.lua` for a `SUPER + ALT` shortcut family:
+Add one shortcut to open the panel:
 
 ```lua
 -- Focus timer
-o.bind("SUPER + ALT + T", "Focus timer: start/pause", "omarchy-shell jimmerioles.focus toggleTimer")
-o.bind("SUPER + ALT + O", "Focus timer: open panel", { panel = "jimmerioles.focus" })
-o.bind("SUPER + ALT + D", "Focus timer: start deep focus", "omarchy-shell jimmerioles.focus startMode deep")
-o.bind("SUPER + ALT + P", "Focus timer: start Pomodoro", "omarchy-shell jimmerioles.focus startMode pomodoro")
-o.bind("SUPER + ALT + B", "Focus timer: skip break", "omarchy-shell jimmerioles.focus skipBreak")
-o.bind("SUPER + ALT + R", "Focus timer: reset session", "omarchy-shell jimmerioles.focus reset")
+o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
 ```
 
-None of these replace a stock Omarchy binding. The panel shortcut uses the shell toggle path, so it opens on the focused monitor like the first-party panels. If a work session is already running, the mode shortcuts queue the chosen mode for the next block rather than interrupting the current session.
+The panel uses the same shell toggle path as the first-party panels, so it opens on the focused monitor. Once open, everything is keyboard navigation:
+
+- `↑` / `↓` or `j` / `k` move between the session-type row and the transport row.
+- `←` / `→` or `h` / `l` move between the two buttons in the current row.
+- `Enter` or `Space` activates the focused button.
+- `Tab` / `Shift + Tab` switch to another bar panel.
+- `Escape` closes the panel.
 
 ## Settings
 

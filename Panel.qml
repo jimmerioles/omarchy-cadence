@@ -108,7 +108,67 @@ Panel {
 
   function selectMode(value) {
     if (service) service.selectMode(value)
+    root.modeIndex = value === "pomodoro" ? 1 : 0
   }
+
+  // Keyboard cursor shared by the mouse and the panel key catcher, following
+  // the first-party panel pattern: one row of choices, one row of transport.
+  property bool cursorActive: false
+  property string focusSection: "transport"
+  property int modeIndex: 0
+  property int transportIndex: 0
+
+  function modeIndexFor(value) {
+    return value === "pomodoro" ? 1 : 0
+  }
+
+  function resetCursor() {
+    cursorActive = false
+    focusSection = "transport"
+    transportIndex = 0
+    modeIndex = modeIndexFor(service ? service.mode : "deep")
+  }
+
+  function pointAtMode(index) {
+    cursorActive = true
+    focusSection = "mode"
+    modeIndex = Math.max(0, Math.min(1, index))
+  }
+
+  function pointAtTransport(index) {
+    cursorActive = true
+    focusSection = "transport"
+    transportIndex = Math.max(0, Math.min(1, index))
+  }
+
+  function moveCursor(dx, dy) {
+    if (!cursorActive) {
+      cursorActive = true
+      return
+    }
+
+    if (focusSection === "mode") {
+      if (dx !== 0) modeIndex = Math.max(0, Math.min(1, modeIndex + dx))
+      else if (dy > 0) focusSection = "transport"
+    } else {
+      if (dx !== 0) transportIndex = Math.max(0, Math.min(1, transportIndex + dx))
+      else if (dy < 0) focusSection = "mode"
+    }
+  }
+
+  function activateCursor() {
+    cursorActive = true
+    if (focusSection === "mode") {
+      var option = modeOptions[modeIndex]
+      if (option) selectMode(option.value)
+    } else if (transportIndex === 0) {
+      toggleTimer()
+    } else {
+      secondaryAction()
+    }
+  }
+
+  onOpenedChanged: if (opened) resetCursor()
 
   KeyboardPanel {
     id: panel
@@ -126,14 +186,10 @@ Panel {
       anchors.fill: parent
       implicitHeight: contentColumn.implicitHeight
 
-      onActivateRequested: root.toggleTimer()
+      onMoveRequested: function(dx, dy) { root.moveCursor(dx, dy) }
+      onActivateRequested: root.activateCursor()
       onCloseRequested: root.close()
       onTabRequested: function(direction) { root.switchPanel(direction) }
-      onTextKey: function(text, modifiers) {
-        if (text === "r" || text === "R") root.secondaryAction()
-        else if (text === "1") root.selectMode("deep")
-        else if (text === "2") root.selectMode("pomodoro")
-      }
 
       Column {
         id: contentColumn
@@ -253,12 +309,14 @@ Panel {
 
               delegate: Button {
                 required property var modelData
+                required property int index
                 width: (modeRow.width - modeRow.spacing) / 2
                 text: modelData.label
                 tooltipText: modelData.tooltip
                 active: root.service
                   ? root.service.mode === modelData.value
                   : modelData.value === "deep"
+                hasCursor: root.cursorActive && root.focusSection === "mode" && root.modeIndex === index
                 bordered: true
                 fontSize: Style.font.bodySmall
                 foreground: root.contentForeground
@@ -267,6 +325,7 @@ Panel {
                 horizontalPadding: Style.spacing.controlPaddingX
                 verticalPadding: Style.spacing.controlPaddingY + Style.space(2)
                 onClicked: root.selectMode(modelData.value)
+                onHovered: function(hovered) { if (hovered) root.pointAtMode(index) }
               }
             }
           }
@@ -293,22 +352,26 @@ Panel {
             width: (parent.width - parent.spacing) / 2
             text: root.primaryLabel
             iconText: root.service && root.service.running ? "\u{f03e4}" : "\u{f040a}"
+            hasCursor: root.cursorActive && root.focusSection === "transport" && root.transportIndex === 0
             bordered: true
             foreground: root.contentForeground
             accent: Commons.Color.accent
             fontFamily: root.contentFontFamily
             onClicked: root.toggleTimer()
+            onHovered: function(hovered) { if (hovered) root.pointAtTransport(0) }
           }
 
           Button {
             width: (parent.width - parent.spacing) / 2
             text: root.secondaryLabel
             iconText: root.secondaryIcon
+            hasCursor: root.cursorActive && root.focusSection === "transport" && root.transportIndex === 1
             bordered: true
             foreground: root.contentForeground
             accent: Commons.Color.accent
             fontFamily: root.contentFontFamily
             onClicked: root.secondaryAction()
+            onHovered: function(hovered) { if (hovered) root.pointAtTransport(1) }
           }
         }
       }

@@ -45,6 +45,14 @@ Panel {
   readonly property string sessionTypeLabel: root.choosingNext
     ? strings.t("panel.nextSession", "Next session")
     : strings.t("panel.sessionType", "Session type")
+  readonly property bool showNextMode: service
+    ? (service.running || service.paused || service.phase === "break")
+    : false
+  readonly property string nextModeLabel: service
+    ? (service.mode === "pomodoro"
+      ? strings.t("panel.pomodoro", "Pomodoro")
+      : strings.t("panel.ultradian", "Ultradian"))
+    : ""
   readonly property string glyph: root.breakPhase ? "\u{f0176}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
@@ -296,10 +304,29 @@ Panel {
           width: parent.width
           spacing: Style.space(10)
 
-          PanelSectionHeader {
-            text: root.sessionTypeLabel
-            foreground: root.contentForeground
-            fontFamily: root.contentFontFamily
+          Item {
+            width: parent.width
+            height: Math.max(sectionHeader.implicitHeight, nextModeText.implicitHeight)
+
+            PanelSectionHeader {
+              id: sectionHeader
+              text: root.sessionTypeLabel
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+            }
+
+            Text {
+              id: nextModeText
+              visible: root.showNextMode && root.nextModeLabel !== ""
+              textFormat: Text.PlainText
+              text: strings.t("panel.nextMode", "Next: %1").arg(root.nextModeLabel)
+              color: root.contentForeground
+              opacity: 0.6
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.caption
+              anchors.right: parent.right
+              anchors.baseline: sectionHeader.baseline
+            }
           }
 
           Row {

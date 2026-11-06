@@ -21,6 +21,7 @@
   "panel.skipBreak": "Skip break",
   "panel.sessionType": "Session type",
   "panel.nextSession": "Next session",
+  "panel.nextMode": "Next: %1",
   "panel.ultradianHint": "%1 minute deep focus block",
   "panel.pomodoroHint": "%1 minute short focus block",
   "panel.today": "Today",

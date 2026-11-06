@@ -42,6 +42,7 @@ Item {
   property string sessionMode: "deep"   // "deep" | "pomodoro"
   property string phase: "work"         // "work" | "break"
   property bool running: false
+  property bool paused: false
   property double endsAt: 0             // epoch ms; only meaningful while running
   property double remainingMs: 90 * 60000
   property double totalMs: 90 * 60000
@@ -60,7 +61,6 @@ Item {
     : 0
   readonly property int workMinutes: sessionMode === "deep" ? deepMinutes : pomodoroMinutes
   readonly property int breakMinutes: sessionMode === "deep" ? deepBreakMinutes : shortBreakMinutes
-  readonly property bool paused: !running && effectiveRemainingMs < totalMs - 500
 
   readonly property string phaseLabel: phase === "break"
     ? strings.t("panel.break", "Break")
@@ -145,6 +145,7 @@ Item {
     endsAt = now + remainingMs
     nowMs = now
     running = true
+    paused = false
     dirty = true
     saveSoon()
   }
@@ -160,6 +161,7 @@ Item {
     }
     remainingMs = left
     running = false
+    paused = true
     endsAt = 0
     dirty = true
     saveSoon()
@@ -172,6 +174,7 @@ Item {
 
   function reset() {
     running = false
+    paused = false
     endsAt = 0
     nowMs = Date.now()
     if (phase === "work") sessionMode = mode
@@ -184,6 +187,7 @@ Item {
   function skipBreak() {
     if (phase !== "break") return
     running = false
+    paused = false
     endsAt = 0
     nowMs = Date.now()
     phase = "work"
@@ -234,6 +238,7 @@ Item {
     phase = "work"
     sessionMode = value
     running = false
+    paused = false
     endsAt = 0
     nowMs = Date.now()
     totalMs = durationFor("work")
@@ -251,6 +256,7 @@ Item {
 
     nowMs = Date.now()
     running = false
+    paused = false
     endsAt = 0
     remainingMs = 0
 
@@ -287,6 +293,7 @@ Item {
       sessionMode = mode
     }
     running = false
+    paused = false
     endsAt = 0
     totalMs = durationFor(phase)
     remainingMs = totalMs
@@ -349,6 +356,7 @@ Item {
   // ---- Persistence ------------------------------------------------------
   function resetForLoad() {
     running = false
+    paused = false
     endsAt = 0
     nowMs = Date.now()
     phase = "work"
@@ -394,22 +402,26 @@ Item {
       remainingMs = Math.min(left, totalMs)
       endsAt = now + remainingMs
       running = true
+      paused = false
     } else if (parsed.running) {
       finishPast()
     } else {
       running = false
+      paused = parsed.paused === true
       endsAt = 0
       remainingMs = parsed.remainingMs > 0 ? parsed.remainingMs : totalMs
       remainingMs = Math.min(remainingMs, totalMs)
 
       // Previously idle or ready to begin: adopt the current configured
-      // durations, which may have changed since the state was written.
-      if (remainingMs >= totalMs - 500) {
+      // durations, which may have changed since the state was written. A
+      // paused session keeps its remaining time.
+      if (!paused && remainingMs >= totalMs - 500) {
         if (phase === "work") sessionMode = mode
         totalMs = durationFor(phase)
         remainingMs = totalMs
       }
       if (remainingMs <= 0) {
+        paused = false
         if (phase === "work") sessionMode = mode
         totalMs = durationFor(phase)
         remainingMs = totalMs
@@ -435,6 +447,7 @@ Item {
       sessionMode: sessionMode,
       phase: phase,
       running: running,
+      paused: paused,
       endsAt: running ? Math.round(endsAt) : 0,
       remainingMs: Math.round(effectiveRemainingMs),
       totalMs: Math.round(totalMs),

@@ -59,6 +59,11 @@ function parseState(raw) {
     sessionMode: sessionMode,
     phase: parsed.phase === "break" ? "break" : "work",
     running: parsed.running === true,
+    paused: typeof parsed.paused === "boolean"
+      ? parsed.paused
+      : (parsed.running !== true
+        && Number(parsed.remainingMs) > 0
+        && Number(parsed.remainingMs) < Number(parsed.totalMs) - 500),
     endsAt: clampNumber(parsed.endsAt, 0, 0, 8640000000000000),
     remainingMs: clampNumber(parsed.remainingMs, 0, 0, 8640000000000000),
     totalMs: clampNumber(parsed.totalMs, 0, 0, 8640000000000000),

@@ -35,7 +35,8 @@ function filesUnder(directory, relative) {
 
 test("manifest uses the current schema and a namespaced id", () => {
   assert.equal(manifest.schemaVersion, 1)
-  assert.equal(manifest.id, "jimmerioles.focus")
+  assert.equal(manifest.id, "jimmerioles.cadence")
+  assert.equal(manifest.name, "Cadence")
   assert.match(manifest.id, /^[A-Za-z0-9][A-Za-z0-9._-]*$/)
   assert(!manifest.id.startsWith("omarchy."), "third-party ids may not use the reserved namespace")
   assert(!manifest.id.includes(".."), "plugin id must stay safe as a directory name")
@@ -85,6 +86,7 @@ test("the bar widget metadata is complete and valid", () => {
     assert.equal(typeof widget[field], "string", `barWidget.${field} must be a string`)
     assert(widget[field].length > 0, `barWidget.${field} must not be empty`)
   }
+  assert.equal(widget.displayName, "Cadence")
   assert.equal(typeof widget.allowMultiple, "boolean")
   assert.equal(widget.allowMultiple, false)
   assert(
@@ -152,6 +154,7 @@ test("the plugin folder contains no symlinks", () => {
 
 test("the package metadata stays in sync with the manifest", () => {
   assert.equal(pkg.private, true)
+  assert.equal(pkg.name, "omarchy-cadence")
   assert.equal(pkg.version, manifest.version)
   assert.equal(pkg.scripts.test, "node --test test/*.test.js")
   assert.equal(typeof pkg.scripts.validate, "string")

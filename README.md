@@ -1,16 +1,16 @@
-# Focus
+# Cadence
 
-A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to turn on Do Not Disturb while you work, hand you back a real break, and stay out of the way.
+A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar—built to keep your cadence, turn on Do Not Disturb while you work, hand you back a real break, and stay out of the way.
 
-[![Tests](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml/badge.svg)](https://github.com/jimmerioles/omarchy-focus/actions/workflows/test.yml)
+[![Tests](https://github.com/jimmerioles/omarchy-cadence/actions/workflows/test.yml/badge.svg)](https://github.com/jimmerioles/omarchy-cadence/actions/workflows/test.yml)
 [![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3da639)](LICENSE)
 
-![Focus demo: a notification arrives, focus starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/focus-demo.gif)
+![Demo: a notification arrives, focus starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/focus-demo.gif)
 
-## Why Focus
+## Why Cadence
 
-- **Focus mode for your desktop.** Start a block and Focus turns on Omarchy's Do Not Disturb—like Focus mode on your phone—and holds it through pauses. At the break, it restores the DND state it changed and replays recent notifications; DND you enabled yourself is left alone.
+- **Focus mode for your desktop.** Start a block and Cadence turns on Omarchy's Do Not Disturb—like Focus mode on your phone—and holds it through pauses. At the break, it restores the DND state it changed and replays recent notifications; DND you enabled yourself is left alone.
 - **Two rhythms.** Deep Focus follows the Ultradian 90/20 rhythm; Short Focus follows Pomodoro 25/5. Both are configurable.
 - **Breaks that happen.** Breaks can start automatically, and notifications mark each transition.
 - **One timer everywhere.** A shared shell service keeps every monitor in sync, survives bar reloads, and resumes a running block after a shell restart.
@@ -22,30 +22,30 @@ A Deep Focus and Short Focus timer for the [Omarchy](https://omarchy.org/) bar�
 **Requirements:** Omarchy 4.5+ (Quattro), tested against 4.5.0, with its notifications service.
 
 ```bash
-omarchy plugin add https://github.com/jimmerioles/omarchy-focus.git --enable
+omarchy plugin add https://github.com/jimmerioles/omarchy-cadence.git --enable
 ```
 
 Omarchy validates the manifest and enables the widget. When the install runs interactively, it asks where to place the widget; the default is the right edge of the center group (`centerEnd`). Move it later with:
 
 ```bash
-omarchy bar move jimmerioles.focus --section centerEnd
+omarchy bar move jimmerioles.cadence --section centerEnd
 ```
 
 Update:
 
 ```bash
-omarchy plugin update jimmerioles.focus
+omarchy plugin update jimmerioles.cadence
 ```
 
 Uninstall:
 
 ```bash
-omarchy plugin remove jimmerioles.focus
+omarchy plugin remove jimmerioles.cadence
 ```
 
 ### Releases
 
-Releases are tagged `vMAJOR.MINOR.PATCH`; the first is [v1.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v1.0.0). Tags mark stable snapshots for pinning or auditing, while the installer and `omarchy plugin update` track the default branch (`master`).
+Releases are tagged `vMAJOR.MINOR.PATCH`; [v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0) is the first tagged release. Tags mark stable snapshots for pinning or auditing, while the installer and `omarchy plugin update` track the default branch (`master`).
 
 Plugins run as unsandboxed code inside the shell process. Only install plugins whose source you trust; this repository is small enough to read first.
 
@@ -55,7 +55,7 @@ Plugins run as unsandboxed code inside the shell process. Only install plugins w
 
 | Action | What it does |
 | --- | --- |
-| Left click | Open or close the Focus panel. |
+| Left click | Open or close the Cadence panel. |
 | Right click | Start or pause the current block. |
 | Middle click | Reset the current block. |
 
@@ -74,13 +74,13 @@ The panel shows the current phase, countdown, progress, and today's completed fo
 Add this binding to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
+o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 `SUPER + ALT + O` is free in stock Omarchy. If you prefer `SUPER + CTRL + ALT + F`, use `o.rebind`; it replaces the stock **Toggle full screen desktop** binding:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
+o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 Hyprland reloads Lua bindings on save. To apply and validate manually:
@@ -102,9 +102,9 @@ Once the panel is open:
 
 ### Notifications and DND
 
-While a focus block is active—including pauses—Focus turns on Do Not Disturb if it was off. At the break it restores the DND state it changed and asks Omarchy to replay recent notifications. A DND you turned on yourself is left alone.
+While a focus block is active—including pauses—Cadence turns on Do Not Disturb if it was off. At the break it restores the DND state it changed and asks Omarchy to replay recent notifications. A DND you turned on yourself is left alone.
 
-The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. Focus completion notifications are sent after DND is restored and include their local send time.
+The replay is Omarchy's shell-wide history (the latest six cards), not a focus-only digest. Cadence completion notifications are sent after DND is restored and include their local send time.
 
 The demo above shows the core loop: a notification arrives, focus starts with DND on, another notification stays quiet, and notifications return after focus.
 
@@ -122,10 +122,10 @@ Defaults:
 Breaks start automatically; the next focus block waits for you. Completion notifications are on.
 
 ```bash
-omarchy bar set jimmerioles.focus deepMinutes 90
-omarchy bar set jimmerioles.focus shortMinutes 25
-omarchy bar set jimmerioles.focus autoStartBreak true
-omarchy bar set jimmerioles.focus notifications true
+omarchy bar set jimmerioles.cadence deepMinutes 90
+omarchy bar set jimmerioles.cadence shortMinutes 25
+omarchy bar set jimmerioles.cadence autoStartBreak true
+omarchy bar set jimmerioles.cadence notifications true
 ```
 
 Settings live on the widget entry in `~/.config/omarchy/shell.json`. A running or paused block keeps its original length; a new length applies to the next phase. See the [settings reference](docs/reference.md#settings) for every key, range, and step.
@@ -133,10 +133,10 @@ Settings live on the widget entry in `~/.config/omarchy/shell.json`. A running o
 ## Command line
 
 ```bash
-omarchy-shell jimmerioles.focus status
-omarchy-shell jimmerioles.focus start
-omarchy-shell jimmerioles.focus startMode short
-omarchy-shell jimmerioles.focus skipBreak
+omarchy-shell jimmerioles.cadence status
+omarchy-shell jimmerioles.cadence start
+omarchy-shell jimmerioles.cadence startMode short
+omarchy-shell jimmerioles.cadence skipBreak
 ```
 
 `status` returns JSON with the selected and current mode, phase, run state, remaining time, progress, and today's completed focus blocks. See the [IPC reference](docs/reference.md#ipc) for all methods and the response schema.
@@ -145,12 +145,12 @@ omarchy-shell jimmerioles.focus skipBreak
 
 | Symptom | Check |
 | --- | --- |
-| The widget is missing | `omarchy plugin list`, then `omarchy plugin enable jimmerioles.focus`. |
+| The widget is missing | `omarchy plugin list`, then `omarchy plugin enable jimmerioles.cadence`. |
 | The panel shortcut does nothing | The binding in `~/.config/hypr/bindings.lua`; run `hyprctl reload` and `hyprctl configerrors`. |
-| The panel says “Focus service is still loading” | Wait a moment after shell startup, or run `omarchy restart shell`. |
+| The panel says “Cadence service is still loading” | Wait a moment after shell startup, or run `omarchy restart shell`. |
 | Notifications are quiet | Check the `notifications` setting and whether Do Not Disturb is still on. |
-| DND is still on after a block | Focus only clears DND it enabled. Turn off DND manually if you enabled it yourself. |
-| The timer needs a clean slate | `omarchy plugin disable jimmerioles.focus`, delete `~/.local/state/omarchy/focus/state.json`, then `omarchy plugin enable jimmerioles.focus`. |
+| DND is still on after a block | Cadence only clears DND it enabled. Turn off DND manually if you enabled it yourself. |
+| The timer needs a clean slate | `omarchy plugin disable jimmerioles.cadence`, delete `~/.local/state/omarchy/cadence/state.json`, then `omarchy plugin enable jimmerioles.cadence`. |
 
 More in [Troubleshooting](docs/usage.md#troubleshooting).
 

@@ -17,7 +17,7 @@ function mode(file) {
 }
 
 function scratch(t) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "omarchy-focus-store-"))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "omarchy-cadence-store-"))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
   return root
 }
@@ -26,7 +26,7 @@ test("prepareStoreCommand passes the paths as argv, never as shell text", () => 
   const command = Model.prepareStoreCommand("/tmp/state dir", "/tmp/state dir/state.json")
   assert.equal(command[0], "bash")
   assert.equal(command[1], "-c")
-  assert.equal(command[3], "omarchy-focus")
+  assert.equal(command[3], "omarchy-cadence")
   assert.equal(command[4], "/tmp/state dir")
   assert.equal(command[5], "/tmp/state dir/state.json")
   assert.equal(command[2].includes("/tmp/state dir"), false)
@@ -34,7 +34,7 @@ test("prepareStoreCommand passes the paths as argv, never as shell text", () => 
 
 test("the state directory is private and the state file is owner-only", (t) => {
   const root = scratch(t)
-  const dir = path.join(root, "focus")
+  const dir = path.join(root, "cadence")
   const file = path.join(dir, "state.json")
 
   const result = run(Model.prepareStoreCommand(dir, file))
@@ -47,7 +47,7 @@ test("the state directory is private and the state file is owner-only", (t) => {
 
 test("an existing state file keeps its contents but is tightened", (t) => {
   const root = scratch(t)
-  const dir = path.join(root, "focus")
+  const dir = path.join(root, "cadence")
   const file = path.join(dir, "state.json")
   fs.mkdirSync(dir, { recursive: true, mode: 0o755 })
   fs.writeFileSync(file, '{"mode":"deep"}')
@@ -63,7 +63,7 @@ test("an existing state file keeps its contents but is tightened", (t) => {
 
 test("a symlinked state file is replaced without touching its target", (t) => {
   const root = scratch(t)
-  const dir = path.join(root, "focus")
+  const dir = path.join(root, "cadence")
   const file = path.join(dir, "state.json")
   const victim = path.join(root, "victim.txt")
   fs.mkdirSync(dir, { recursive: true })

@@ -158,7 +158,7 @@ test("every documented IPC example uses a real handler", () => {
 
   for (const file of MARKDOWN_FILES) {
     const source = read(file)
-    for (const match of source.matchAll(/omarchy-shell jimmerioles\.focus ([A-Za-z0-9_]+)/g)) {
+    for (const match of source.matchAll(/omarchy-shell jimmerioles\.cadence ([A-Za-z0-9_]+)/g)) {
       assert(
         handlers.has(match[1]),
         `${file}: documented IPC method does not exist: ${match[1]}`

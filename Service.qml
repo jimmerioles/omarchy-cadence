@@ -5,7 +5,7 @@ import qs.Commons
 import qs.Commons as Commons
 import "FocusModel.js" as FocusModel
 
-// Shared focus-timer state. One instance serves every bar surface, so the
+// Shared Cadence session state. One instance serves every bar surface, so the
 // countdown, mode, and session count stay identical on all monitors and across
 // bar reloads. The bar widget only renders this and forwards clicks.
 //
@@ -18,7 +18,7 @@ Item {
   property var shell: null
   property var manifest: null
 
-  readonly property string stateDir: (Quickshell.env("HOME") || "") + "/.local/state/omarchy/focus"
+  readonly property string stateDir: (Quickshell.env("HOME") || "") + "/.local/state/omarchy/cadence"
   readonly property string statePath: stateDir + "/state.json"
 
   Commons.Translations {
@@ -125,7 +125,7 @@ Item {
     if (effects.stopHistoryReplay) historyReplayTimer.stop()
 
     if (effects.dnd === "query") {
-      refreshFocusDnd()
+      refreshSessionDnd()
     } else if (effects.dnd === "on") {
       Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
     } else if (effects.dnd === "off") {
@@ -217,9 +217,9 @@ Item {
   }
 
   // ---- Do Not Disturb ---------------------------------------------------
-  // Focus only turns DND off again when it was the one that turned it on.
+  // Cadence only turns DND off again when it was the one that turned it on.
   // A DND the user set themselves is left alone.
-  function refreshFocusDnd() {
+  function refreshSessionDnd() {
     if (phase !== "work" || !running) return
     if (dndOwned) {
       Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
@@ -251,7 +251,7 @@ Item {
     var extraAction = []
     if (!autoStartBreak) {
       extraAction = ["--action", strings.t("notify.startBreak", "Start break"),
-                     "omarchy-shell", "jimmerioles.focus", "start"]
+                     "omarchy-shell", "jimmerioles.cadence", "start"]
     }
     sendNotification(title, body, "\u{f08c9}", extraAction)
   }
@@ -264,7 +264,7 @@ Item {
     var extraAction = []
     if (!autoStartWork) {
       extraAction = ["--action", strings.t("notify.startWork", "Start focus"),
-                     "omarchy-shell", "jimmerioles.focus", "start"]
+                     "omarchy-shell", "jimmerioles.cadence", "start"]
     }
     sendNotification(strings.t("notify.breakDone", "Break complete · %1").arg(completionTime()),
                      body, "\u{f117c}", extraAction)
@@ -276,9 +276,9 @@ Item {
       String(title), String(body),
       "-g", glyph,
       "-u", "normal",
-      "--app-name", "Focus",
-      "--action", strings.t("notify.open", "Open Focus"),
-      "omarchy-shell", "jimmerioles.focus", "open"
+      "--app-name", "Cadence",
+      "--action", strings.t("notify.open", "Open Cadence"),
+      "omarchy-shell", "jimmerioles.cadence", "open"
     ]
     if (extraAction && extraAction.length > 0) argv = argv.concat(extraAction)
     Util.execArgv(argv)

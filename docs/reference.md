@@ -1,6 +1,6 @@
-# Focus reference
+# Cadence reference
 
-Exact commands, settings, IPC, and state for Focus.
+Exact commands, settings, IPC, and state for Cadence.
 
 ## Compatibility
 
@@ -11,7 +11,7 @@ Exact commands, settings, IPC, and state for Focus.
 | Omarchy plugin manifest | `schemaVersion: 1` |
 | Node for the test suite | 20 or newer |
 
-Focus requires Omarchy 4.5+ with the bundled Quickshell notifications service.
+Cadence requires Omarchy 4.5+ with the bundled Quickshell notifications service.
 The plugin CI targets Omarchy `v4.5.0`. Newer releases are not assumed
 compatible until they are tested.
 
@@ -20,26 +20,26 @@ compatible until they are tested.
 ### Install, update, remove
 
 ```bash
-omarchy plugin add https://github.com/jimmerioles/omarchy-focus.git --enable
-omarchy plugin update jimmerioles.focus
-omarchy plugin remove jimmerioles.focus
+omarchy plugin add https://github.com/jimmerioles/omarchy-cadence.git --enable
+omarchy plugin update jimmerioles.cadence
+omarchy plugin remove jimmerioles.cadence
 ```
 
-Releases are tagged `vX.Y.Z`; [v1.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v1.0.0)
+Releases are tagged `vX.Y.Z`; [v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0)
 is the first. The installer and `omarchy plugin update` follow the default
 branch (`master`), not tags.
 
 `omarchy plugin add --enable` validates the manifest, clones the repository into
-`~/.config/omarchy/plugins/jimmerioles.focus`, and, when run interactively, asks
+`~/.config/omarchy/plugins/jimmerioles.cadence`, and, when run interactively, asks
 where to place the widget. The manifest default is `centerEnd`, the right edge
 of the center group.
 
 ### Placement
 
 ```bash
-omarchy bar move jimmerioles.focus --section centerEnd
-omarchy bar move jimmerioles.focus --section right
-omarchy bar move jimmerioles.focus --section centerEnd --after omarchy.system-update
+omarchy bar move jimmerioles.cadence --section centerEnd
+omarchy bar move jimmerioles.cadence --section right
+omarchy bar move jimmerioles.cadence --section centerEnd --after omarchy.system-update
 ```
 
 Valid sections are `left`, `centerBegin`, `center`, `centerEnd`, `tray`, and
@@ -51,13 +51,13 @@ Valid sections are `left`, `centerBegin`, `center`, `centerEnd`, `tray`, and
 Add to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
+o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 To replace the stock **Toggle full screen desktop** binding:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
+o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 Apply and validate:
@@ -86,19 +86,19 @@ Settings are stored on the widget's entry in
 Examples:
 
 ```bash
-omarchy bar set jimmerioles.focus deepMinutes 90
-omarchy bar set jimmerioles.focus shortMinutes 25
-omarchy bar set jimmerioles.focus deepBreakMinutes 20
-omarchy bar set jimmerioles.focus shortBreakMinutes 5
-omarchy bar set jimmerioles.focus autoStartBreak true
-omarchy bar set jimmerioles.focus autoStartWork false
-omarchy bar set jimmerioles.focus notifications true
+omarchy bar set jimmerioles.cadence deepMinutes 90
+omarchy bar set jimmerioles.cadence shortMinutes 25
+omarchy bar set jimmerioles.cadence deepBreakMinutes 20
+omarchy bar set jimmerioles.cadence shortBreakMinutes 5
+omarchy bar set jimmerioles.cadence autoStartBreak true
+omarchy bar set jimmerioles.cadence autoStartWork false
+omarchy bar set jimmerioles.cadence notifications true
 ```
 
 Read one value:
 
 ```bash
-omarchy bar get jimmerioles.focus deepMinutes
+omarchy bar get jimmerioles.cadence deepMinutes
 ```
 
 Changing a duration while a focus block is running or paused leaves that block
@@ -107,7 +107,7 @@ length applies to the next phase.
 
 ## IPC
 
-Focus exposes its controls through the `jimmerioles.focus` IPC target.
+Cadence exposes its controls through the `jimmerioles.cadence` IPC target.
 
 | Method | Arguments | What it does |
 | --- | --- | --- |
@@ -128,16 +128,16 @@ Focus exposes its controls through the `jimmerioles.focus` IPC target.
 Examples:
 
 ```bash
-omarchy-shell jimmerioles.focus status
-omarchy-shell jimmerioles.focus start
-omarchy-shell jimmerioles.focus pause
-omarchy-shell jimmerioles.focus toggleTimer
-omarchy-shell jimmerioles.focus reset
-omarchy-shell jimmerioles.focus skipBreak
-omarchy-shell jimmerioles.focus setMode deep
-omarchy-shell jimmerioles.focus startMode short
-omarchy-shell jimmerioles.focus open
-omarchy-shell jimmerioles.focus close
+omarchy-shell jimmerioles.cadence status
+omarchy-shell jimmerioles.cadence start
+omarchy-shell jimmerioles.cadence pause
+omarchy-shell jimmerioles.cadence toggleTimer
+omarchy-shell jimmerioles.cadence reset
+omarchy-shell jimmerioles.cadence skipBreak
+omarchy-shell jimmerioles.cadence setMode deep
+omarchy-shell jimmerioles.cadence startMode short
+omarchy-shell jimmerioles.cadence open
+omarchy-shell jimmerioles.cadence close
 ```
 
 ### `status` response
@@ -176,10 +176,10 @@ Example:
 
 ## State file
 
-Focus keeps its timer state at:
+Cadence keeps its timer state at:
 
 ```text
-~/.local/state/omarchy/focus/state.json
+~/.local/state/omarchy/cadence/state.json
 ```
 
 The directory is created with mode `700`; the state file is written with mode
@@ -191,26 +191,26 @@ The state includes the selected and current session type, phase, run and pause
 state, wall-clock deadline, remaining and total milliseconds, DND ownership, and
 today's date and count.
 
-If Focus owned DND when the shell stopped, that ownership is persisted so a
+If Cadence owned DND when the shell stopped, that ownership is persisted so a
 restart can reassert DND during a running or paused focus block, or release it
 if the phase is no longer active.
 
 ### Reset the state
 
 ```bash
-omarchy plugin disable jimmerioles.focus
-rm ~/.local/state/omarchy/focus/state.json
-omarchy plugin enable jimmerioles.focus
+omarchy plugin disable jimmerioles.cadence
+rm ~/.local/state/omarchy/cadence/state.json
+omarchy plugin enable jimmerioles.cadence
 ```
 
 ## Data and privacy
 
-Focus is local-only. It has no accounts, telemetry, or network calls.
+Cadence is local-only. It has no accounts, telemetry, or network calls.
 
 It reads and writes:
 
 - settings on its entry in `~/.config/omarchy/shell.json`
-- timer state in `~/.local/state/omarchy/focus/state.json`
+- timer state in `~/.local/state/omarchy/cadence/state.json`
 
 It runs these Omarchy commands:
 
@@ -223,6 +223,6 @@ No notification contents or window titles are stored in the state file.
 
 ## Related docs
 
-- [Using Focus](usage.md) — day-to-day behavior, DND, keyboard, troubleshooting.
+- [Using Cadence](usage.md) — day-to-day behavior, DND, keyboard, troubleshooting.
 - [Architecture](architecture.md) — internals, state machine, testing.
 - [Contributing](../CONTRIBUTING.md) — setup, tests, release checklist.

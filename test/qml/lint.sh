@@ -24,7 +24,7 @@ fi
 [[ -f $OMARCHY_PATH/shell/Commons/Style.qml ]] || skip_or_fail "OMARCHY_PATH does not point at an Omarchy checkout: $OMARCHY_PATH"
 OMARCHY_PATH=$(cd -- "$OMARCHY_PATH" && pwd -P)
 
-TMP=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-focus-lint.XXXXXX")
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-cadence-lint.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 
 # qmllint resolves `import qs.Commons` as the module directory qs/Commons, not

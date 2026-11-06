@@ -21,7 +21,7 @@ command -v jq >/dev/null 2>&1 || skip_or_fail "jq is not installed"
 [[ -f $OMARCHY_PATH/shell/Commons/Translations.qml ]] || skip_or_fail "OMARCHY_PATH does not point at an Omarchy checkout: $OMARCHY_PATH"
 OMARCHY_PATH=$(cd -- "$OMARCHY_PATH" && pwd -P)
 
-TMP=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-focus-qml.XXXXXX")
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-cadence-qml.XXXXXX")
 QS_PID=""
 
 cleanup() {
@@ -44,7 +44,7 @@ ln -s "$OMARCHY_PATH/shell" "$TMP/imports/qs"
 
 cat >"$TMP/bin/omarchy-shell" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >> "$FOCUS_TEST_COMMAND_LOG"
+printf '%s\n' "$*" >> "$CADENCE_TEST_COMMAND_LOG"
 if [[ ${1:-} == notifications && ${2:-} == isDnd ]]; then
   echo off
 fi
@@ -53,7 +53,7 @@ SH
 
 cat >"$TMP/bin/omarchy-notification-send" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >> "$FOCUS_TEST_NOTIFICATION_LOG"
+printf '%s\n' "$*" >> "$CADENCE_TEST_NOTIFICATION_LOG"
 exit 0
 SH
 
@@ -118,10 +118,10 @@ run_fixture() {
       QML2_IMPORT_PATH="$TMP/imports" \
       QML_IMPORT_PATH="$TMP/imports" \
       OMARCHY_PATH="$OMARCHY_PATH" \
-      FOCUS_PLUGIN_DIR="$ROOT" \
-      FOCUS_TEST_RESULT="$TMP/result.json" \
-      FOCUS_TEST_COMMAND_LOG="$TMP/commands.log" \
-      FOCUS_TEST_NOTIFICATION_LOG="$TMP/notifications.log" \
+      CADENCE_PLUGIN_DIR="$ROOT" \
+      CADENCE_TEST_RESULT="$TMP/result.json" \
+      CADENCE_TEST_COMMAND_LOG="$TMP/commands.log" \
+      CADENCE_TEST_NOTIFICATION_LOG="$TMP/notifications.log" \
       QT_QPA_PLATFORM=offscreen \
       quickshell -p "$ROOT/test/qml/fixtures/$name" --no-color
   ) >"$TMP/$name.log" 2>&1 &
@@ -156,17 +156,17 @@ run_fixture() {
 
   if [[ $name == "service" ]]; then
     grep -q 'notifications isDnd' "$TMP/commands.log" || fail "$name" "the DND probe never ran"
-    grep -q 'notifications setDnd true' "$TMP/commands.log" || fail "$name" "Focus never claimed DND"
-    grep -q 'notifications setDnd false' "$TMP/commands.log" || fail "$name" "Focus never released DND"
-    grep -q 'notifications showHistory' "$TMP/commands.log" || fail "$name" "Focus never replayed notification history"
+    grep -q 'notifications setDnd true' "$TMP/commands.log" || fail "$name" "Cadence never claimed DND"
+    grep -q 'notifications setDnd false' "$TMP/commands.log" || fail "$name" "Cadence never released DND"
+    grep -q 'notifications showHistory' "$TMP/commands.log" || fail "$name" "Cadence never replayed notification history"
     grep -q 'Deep Focus complete' "$TMP/notifications.log" || fail "$name" "the work notification never arrived"
     grep -q 'Break complete' "$TMP/notifications.log" || fail "$name" "the break notification never arrived"
   fi
 
   if [[ $name == "restart" ]]; then
     grep -q 'notifications setDnd false' "$TMP/commands.log" || fail "$name" "destroying a running service did not release DND"
-    [[ -f $TMP/home/.local/state/omarchy/focus/state.json ]] || fail "$name" "the recovered state file is missing"
-    jq -e '.version == 2' "$TMP/home/.local/state/omarchy/focus/state.json" >/dev/null 2>&1 \
+    [[ -f $TMP/home/.local/state/omarchy/cadence/state.json ]] || fail "$name" "the recovered state file is missing"
+    jq -e '.version == 2' "$TMP/home/.local/state/omarchy/cadence/state.json" >/dev/null 2>&1 \
       || fail "$name" "the recovered state file is not version 2"
   fi
 

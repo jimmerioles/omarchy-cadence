@@ -1,4 +1,4 @@
-// Pure helpers and session transitions for the Focus timer. State parsing
+// Pure helpers and session transitions for the Cadence timer. State parsing
 // validates everything that comes back from disk, so a hand-edited or
 // truncated state file can only ever produce a reset timer, never a bad
 // duration or an unsafe display value.
@@ -616,7 +616,7 @@ function prepareStoreCommand(stateDir, statePath) {
     "mkdir -p -- \"$dir\" && chmod 700 -- \"$dir\" || exit 1\n" +
     "if [[ -L $file ]]; then rm -f -- \"$file\"; fi\n" +
     "if [[ -f $file ]]; then chmod 600 -- \"$file\"; elif [[ ! -e $file ]]; then : >\"$file\"; fi\n",
-    "omarchy-focus", stateDir, statePath
+    "omarchy-cadence", stateDir, statePath
   ]
 }
 

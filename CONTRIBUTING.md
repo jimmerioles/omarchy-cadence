@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Focus. The timer core is small on purpose; the best
+Thanks for helping improve Cadence. The timer core is small on purpose; the best
 changes are focused, tested, and easy to reason about.
 
 ## Before you start
@@ -17,15 +17,15 @@ You need:
 Clone the repository, then link it into the Omarchy plugins directory:
 
 ```bash
-git clone https://github.com/jimmerioles/omarchy-focus.git
-cd omarchy-focus
+git clone https://github.com/jimmerioles/omarchy-cadence.git
+cd omarchy-cadence
 
-# If the released plugin is already installed, remove it first.
-omarchy plugin remove jimmerioles.focus
+# Remove any installed copy first.
+omarchy plugin remove jimmerioles.cadence
 
-ln -s "$PWD" ~/.config/omarchy/plugins/jimmerioles.focus
+ln -s "$PWD" ~/.config/omarchy/plugins/jimmerioles.cadence
 omarchy-shell shell rescanPlugins
-omarchy plugin enable jimmerioles.focus
+omarchy plugin enable jimmerioles.cadence
 ```
 
 The plugin folder itself may be a symlink. Files inside it may not be; the
@@ -39,7 +39,7 @@ omarchy-shell shell rescanPlugins
 When you are done, remove the development link:
 
 ```bash
-omarchy plugin remove jimmerioles.focus
+omarchy plugin remove jimmerioles.cadence
 ```
 
 The test fixtures make their own isolated `HOME` and never touch your live
@@ -114,7 +114,7 @@ When adding or changing an IPC method:
 
 ## Adding a language
 
-Focus ships English only today, but the UI is ready for more catalogs:
+Cadence ships English only today, but the UI is ready for more catalogs:
 
 1. Copy `i18n/en.json` to the Omarchy language code, for example `da.json` or
    `pt-BR.json`.
@@ -148,7 +148,8 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
 2. Update `ROADMAP.md` so the current release matches the manifest and the next
    release is accurate.
 3. Update the README, reference, or usage guide for any behavior change.
-4. Recapture `assets/focus-demo.gif` if the panel or bar changed visibly.
+4. Recapture `assets/focus-demo.gif` with Cadence captions if the panel or bar
+   changed visibly.
 5. Run the full checklist:
 
    ```bash
@@ -161,7 +162,7 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
 6. Commit the release, then create and push an annotated tag:
 
    ```bash
-   git tag -a vX.Y.Z -m "Focus X.Y.Z"
+   git tag -a vX.Y.Z -m "Cadence X.Y.Z"
    git push origin vX.Y.Z
    ```
 
@@ -182,7 +183,7 @@ earlier commits were development iterations and were never tagged.
 Open an issue with:
 
 - Omarchy version (`pacman -Q omarchy`)
-- the output of `omarchy-shell jimmerioles.focus status`
+- the output of `omarchy-shell jimmerioles.cadence status`
 - whether the problem survives `omarchy restart shell`
 - reproduction steps
 

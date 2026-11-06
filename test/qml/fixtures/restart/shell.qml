@@ -7,12 +7,12 @@ import Quickshell.Io
 ShellRoot {
   id: root
 
-  readonly property string pluginDir: Quickshell.env("FOCUS_PLUGIN_DIR") || ""
-  readonly property string resultPath: Quickshell.env("FOCUS_TEST_RESULT") || ""
+  readonly property string pluginDir: Quickshell.env("CADENCE_PLUGIN_DIR") || ""
+  readonly property string resultPath: Quickshell.env("CADENCE_TEST_RESULT") || ""
   readonly property string home: Quickshell.env("HOME") || ""
 
   property var service: null
-  property string statePath: home + "/.local/state/omarchy/focus/state.json"
+  property string statePath: home + "/.local/state/omarchy/cadence/state.json"
   property var failures: []
   property int step: 0
   property double stepStarted: Date.now()

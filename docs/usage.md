@@ -1,6 +1,6 @@
-# Using Focus
+# Using Cadence
 
-Focus is a bar timer for two working rhythms. Deep Focus follows the Ultradian
+Cadence is a bar timer for two working rhythms. Deep Focus follows the Ultradian
 90/20 pattern; Short Focus follows Pomodoro 25/5. Both lengths are configurable,
 so the rhythm can fit your work instead of the other way around.
 
@@ -23,9 +23,9 @@ so the rhythm can fit your work instead of the other way around.
 
 1. Choose Deep Focus or Short Focus.
 2. Start the focus block.
-3. When the block ends, Focus moves to the matching break. The break can start
+3. When the block ends, Cadence moves to the matching break. The break can start
    automatically or wait for you.
-4. When the break ends, Focus returns to a ready focus block. It can start
+4. When the break ends, Cadence returns to a ready focus block. It can start
    automatically or wait for you.
 
 The panel header names the current phase. While a block or break is active, the
@@ -59,8 +59,8 @@ happens immediately depends on the current phase:
 Use **Skip break** to end a break early and return to a ready focus block in the
 queued type. Skip break only appears during a break.
 
-Resetting a focus block also releases DND that Focus owns. Reset during a break
-only restarts the break and does not change DND.
+Resetting a focus block also releases DND that Cadence owns. Reset during a
+break only restarts the break and does not change DND.
 
 ## Auto-start behavior
 
@@ -94,14 +94,14 @@ ready break yourself.
 Add a binding to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Focus timer", { panel = "jimmerioles.focus" })
+o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 `SUPER + ALT + O` is free in stock Omarchy. To use `SUPER + CTRL + ALT + F`
 instead, replace the stock **Toggle full screen desktop** binding:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Focus timer", { panel = "jimmerioles.focus" })
+o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
 ```
 
 Hyprland reloads Lua bindings on save. To apply and validate manually:
@@ -123,23 +123,23 @@ Once the panel is open:
 
 ## Notifications and DND
 
-Focus uses Omarchy's global Do Not Disturb and notification history; it does not
-run its own notification daemon.
+Cadence uses Omarchy's global Do Not Disturb and notification history; it does
+not run its own notification daemon.
 
 ### While focusing
 
-- When a focus block starts or resumes and DND is **off**, Focus turns it on and
-  remembers that it owns it.
-- If DND was **already on**, Focus leaves it on but does not claim ownership.
+- When a focus block starts or resumes and DND is **off**, Cadence turns it on
+  and remembers that it owns it.
+- If DND was **already on**, Cadence leaves it on but does not claim ownership.
 - DND stays on while a focus block is paused.
-- Focus never changes DND during a break.
+- Cadence never changes DND during a break.
 
 ### When the focus block ends
 
-- If Focus owns DND, it turns DND off and asks Omarchy to replay recent
+- If Cadence owns DND, it turns DND off and asks Omarchy to replay recent
   notifications.
-- If you own DND, Focus leaves it on and does not trigger a replay.
-- Focus sends its completion notification after restoring DND. If your own DND
+- If you own DND, Cadence leaves it on and does not trigger a replay.
+- Cadence sends its completion notification after restoring DND. If your own DND
   is still on, that completion card stays quiet until you turn DND off.
 
 The replay is Omarchy's shell-wide history: the latest six cards. It is not a
@@ -156,7 +156,7 @@ offers **Start focus**.
 The `notifications` setting controls these completion cards only. Turning it off
 does not disable DND or history replay.
 
-Focus completion cards include their local send time, so separate runs remain
+Cadence completion cards include their local send time, so separate runs remain
 distinguishable when history is replayed.
 
 ## Daily count
@@ -173,10 +173,10 @@ it as complete.
 The timer is a shared shell service, not a per-monitor widget. Every monitor
 shows the same countdown, and reloading the bar does not create a second timer.
 
-A running block stores its wall-clock end time. After a shell restart, Focus
+A running block stores its wall-clock end time. After a shell restart, Cadence
 resumes from that deadline instead of starting over.
 
-If a block ends while the shell is down, Focus completes it silently when the
+If a block ends while the shell is down, Cadence completes it silently when the
 shell next loads: the session count is updated, DND is released, and the next
 phase is ready without a stale notification at login.
 
@@ -190,13 +190,13 @@ arrive when you wake rather than at the original deadline.
 
 ```bash
 omarchy plugin list
-omarchy plugin enable jimmerioles.focus
+omarchy plugin enable jimmerioles.cadence
 ```
 
 If the plugin is enabled but not on the bar:
 
 ```bash
-omarchy bar move jimmerioles.focus --section centerEnd
+omarchy bar move jimmerioles.cadence --section centerEnd
 ```
 
 ### The panel shortcut does nothing
@@ -208,7 +208,7 @@ hyprctl reload
 hyprctl configerrors
 ```
 
-### The panel says “Focus service is still loading”
+### The panel says “Cadence service is still loading”
 
 The shared service has not finished loading. Wait a moment after shell startup.
 If it persists:
@@ -220,14 +220,14 @@ omarchy restart shell
 ### Notifications are quiet
 
 - Check `notifications` is `true`:
-  `omarchy bar get jimmerioles.focus notifications`
-- Check whether Do Not Disturb is still on. Focus only clears DND it enabled.
+  `omarchy bar get jimmerioles.cadence notifications`
+- Check whether Do Not Disturb is still on. Cadence only clears DND it enabled.
 - If you turned DND on yourself, turn it off with the Omarchy notification
   controls or `omarchy-shell notifications setDnd false`.
 
 ### DND is still on after a block
 
-That is expected when you enabled DND yourself. Focus only turns off DND it
+That is expected when you enabled DND yourself. Cadence only turns off DND it
 claimed. Turn it off with the Omarchy notification controls.
 
 ### The timer needs a clean slate
@@ -235,9 +235,9 @@ claimed. Turn it off with the Omarchy notification controls.
 Disable the plugin, remove the state file, then enable it again:
 
 ```bash
-omarchy plugin disable jimmerioles.focus
-rm ~/.local/state/omarchy/focus/state.json
-omarchy plugin enable jimmerioles.focus
+omarchy plugin disable jimmerioles.cadence
+rm ~/.local/state/omarchy/cadence/state.json
+omarchy plugin enable jimmerioles.cadence
 ```
 
 The state directory is private to your user. A corrupt or truncated state file
@@ -246,8 +246,8 @@ is ignored automatically; you do not need to edit it by hand.
 ### The plugin will not install or update
 
 ```bash
-omarchy plugin validate ~/.config/omarchy/plugins/jimmerioles.focus
-omarchy plugin update jimmerioles.focus
+omarchy plugin validate ~/.config/omarchy/plugins/jimmerioles.cadence
+omarchy plugin update jimmerioles.cadence
 ```
 
 If an update cannot fast-forward because of local changes, remove and reinstall
@@ -257,11 +257,11 @@ keep.
 ### Reporting a bug
 
 Open an issue at
-[github.com/jimmerioles/omarchy-focus/issues](https://github.com/jimmerioles/omarchy-focus/issues)
+[github.com/jimmerioles/omarchy-cadence/issues](https://github.com/jimmerioles/omarchy-cadence/issues)
 with:
 
 - your Omarchy version (`pacman -Q omarchy`)
-- the output of `omarchy-shell jimmerioles.focus status`
+- the output of `omarchy-shell jimmerioles.cadence status`
 - whether the problem happens after a shell restart
 - the steps that reproduce it
 

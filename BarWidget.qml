@@ -4,11 +4,11 @@ import qs.Commons as Commons
 import qs.Ui
 import "FocusModel.js" as FocusModel
 
-// Bar entry for the shared focus timer. The countdown itself lives in
+// Bar entry for the shared Cadence timer. The countdown itself lives in
 // Service.qml so every monitor and every bar reload sees the same session.
 BarWidget {
   id: root
-  moduleName: "jimmerioles.focus"
+  moduleName: "jimmerioles.cadence"
 
   property var service: null
 
@@ -22,9 +22,9 @@ BarWidget {
   readonly property string timeText: service
     ? FocusModel.formatClock(service.effectiveRemainingMs, Commons.I18n.formatNumber)
     : "00:00"
-  readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Focus")
+  readonly property string phaseLabel: service ? service.phaseLabel : strings.t("widget.name", "Cadence")
   readonly property string tooltipText: {
-    if (!service) return strings.t("widget.tooltip", "Focus timer")
+    if (!service) return strings.t("widget.tooltip", "Cadence timer")
     return root.phaseLabel + " · " + root.timeText + " · " + service.statusLabel
   }
   readonly property bool active: service ? service.running : false
@@ -105,7 +105,7 @@ BarWidget {
   Component.onCompleted: resolveService()
 
   Commons.ShellIpc {
-    target: "jimmerioles.focus"
+    target: "jimmerioles.cadence"
 
     function open(): void { root.open() }
     function close(): void { root.close() }

@@ -1,6 +1,6 @@
-# Focus Roadmap
+# Cadence Roadmap
 
-Focus is a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the
+Cadence is a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the
 Omarchy bar. It silences notifications while a work block is active and is
 growing into a gentle anti-distraction companion that helps you notice when you
 leave the task and return to it.
@@ -9,7 +9,7 @@ This file is the public direction for the plugin: what we intend to build, in
 what order, and what we deliberately will not build. It is directional, not a
 promise of dates.
 
-- Current release: `1.0.0` — first tagged release ([v1.0.0](https://github.com/jimmerioles/omarchy-focus/releases/tag/v1.0.0))
+- Current release: `1.0.0` — first tagged release ([v1.0.0](https://github.com/jimmerioles/omarchy-cadence/releases/tag/v1.0.0))
 - Next release: `1.1.0 — Focus Guard`
 
 ## Release history
@@ -34,12 +34,12 @@ promise of dates.
 
 ## Shipped
 
-### 1.0.0 — Focus timer
+### 1.0.0 — Initial release
 
 - Deep Focus (ultradian) and Short Focus (Pomodoro) sessions.
 - Automatic breaks, pause/resume/reset, skip break.
 - DND while a work block is active, including pauses.
-- Restores only the DND state Focus enabled itself.
+- Restores only the DND state Cadence enabled itself.
 - Notification replay at the break.
 - Persisted timer state and restart recovery.
 - Daily completed-session count.
@@ -67,9 +67,9 @@ working on the goal." Gentle nudges only; no enforcement.
     Signal, Steam.
   - Browser-title keywords: YouTube, X/Twitter, Reddit, Instagram, Facebook,
     TikTok, Netflix, Twitch. Only matched for known browser app IDs.
-  - Non-modal card anchored to the Focus bar icon. No focus stealing.
+  - Non-modal card anchored to the Cadence bar icon. No focus stealing.
   - Auto-dismiss after roughly 15 seconds.
-  - Suppressed while the main Focus panel or park capture is open.
+  - Suppressed while the main Cadence panel or park capture is open.
   - Proposed default: on with the conservative denylist, subject to final
     review. The panel toggle can turn it off.
 
@@ -82,7 +82,7 @@ working on the goal." Gentle nudges only; no enforcement.
 
 - **Parking lot.** A local list of thoughts captured during focus.
   - Quick-capture keybind plus the guard's Park it action.
-  - Saved locally in the Focus state directory.
+  - Saved locally in the Cadence state directory.
   - Panel shows a live count: `Guard: on · 2 drifts · 3 parked`.
 
 - **Hooks.** Emit:

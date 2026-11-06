@@ -1,6 +1,6 @@
 {
-  "widget.name": "Focus",
-  "widget.tooltip": "Focus timer",
+  "widget.name": "Cadence",
+  "widget.tooltip": "Cadence timer",
   "panel.deep": "Deep Focus",
   "panel.short": "Short Focus",
   "panel.break": "Break",
@@ -30,7 +30,7 @@
     "one": "%1 session",
     "other": "%1 sessions"
   },
-  "panel.unavailable": "Focus service is still loading.",
+  "panel.unavailable": "Cadence service is still loading.",
   "notify.deepDone": "Deep Focus complete · %1",
   "notify.shortDone": "Short Focus complete · %1",
   "notify.breakStarted": "A %1 minute break has started. Step away.",
@@ -38,7 +38,7 @@
   "notify.breakDone": "Break complete · %1",
   "notify.ready": "Ready for the next session.",
   "notify.nextStarted": "The next session has started.",
-  "notify.open": "Open Focus",
+  "notify.open": "Open Cadence",
   "notify.startBreak": "Start break",
   "notify.startWork": "Start focus"
 }

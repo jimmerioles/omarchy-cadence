@@ -1,8 +1,8 @@
 {
-  "name": "omarchy-focus",
+  "name": "omarchy-cadence",
   "private": true,
   "version": "1.0.0",
-  "description": "Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
+  "description": "Cadence: a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
   "engines": {
     "node": ">=20"
   },

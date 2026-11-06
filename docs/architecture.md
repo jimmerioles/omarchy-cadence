@@ -1,6 +1,6 @@
 # Architecture
 
-Focus is a small Omarchy shell plugin with a deliberately narrow core: a pure
+Cadence is a small Omarchy shell plugin with a deliberately narrow core: a pure
 timer model, a QML service that applies the model's effects, a bar widget, and
 a panel. The separation keeps every rule testable from Node and keeps QML
 changes away from timer logic.
@@ -84,7 +84,7 @@ the count without a stale notification.
 
 ## Persistence and restart recovery
 
-State lives in `~/.local/state/omarchy/focus/state.json`. The directory is mode
+State lives in `~/.local/state/omarchy/cadence/state.json`. The directory is mode
 `700`, the file is mode `600`, and writes are atomic. `Service.qml` prepares the
 directory and file through an argv-safe shell command before loading anything.
 
@@ -103,18 +103,18 @@ produce a valid timer, never an unsafe duration or display value.
 
 ## DND ownership
 
-Focus is a guest in Omarchy's global notification state. It only turns DND off
+Cadence is a guest in Omarchy's global notification state. It only turns DND off
 when it was the component that turned it on:
 
 1. Starting or resuming work queries DND when not already owned.
-2. If DND is off, Focus turns it on and records ownership.
-3. If DND is already on, Focus leaves it alone and records no ownership.
+2. If DND is off, Cadence turns it on and records ownership.
+3. If DND is already on, Cadence leaves it alone and records no ownership.
 4. When work ends, owned DND is released and history is replayed. User-owned DND
    stays on and no replay is triggered.
 5. Ownership is persisted so a restart can reassert or release it correctly.
 
-Focus's own completion notification is sent after DND is restored, so it is not
-silenced by the DND that Focus just released. Notification ordering and the
+Cadence's own completion notification is sent after DND is restored, so it is not
+silenced by the DND that Cadence just released. Notification ordering and the
 history replay delay live in `Service.qml`; the decision to emit them lives in
 the model.
 
@@ -130,7 +130,7 @@ the model.
   invokes only local Omarchy commands.
 - **Plain text.** Display text uses `Text.PlainText` where the plugin owns the
   sink; translated strings are kept whole with `%1` placeholders.
-- **No hard blocking.** Focus never closes or blocks applications. Future guard
+- **No hard blocking.** Cadence never closes or blocks applications. Future guard
   work is expected to nudge, not enforce.
 
 ## Testing
@@ -152,7 +152,7 @@ update the reference and let the test confirm the rest.
 
 ## Compatibility contract
 
-Focus targets the Omarchy 4.5 shell plugin API (`schemaVersion: 1`) and the
+Cadence targets the Omarchy 4.5 shell plugin API (`schemaVersion: 1`) and the
 bundled notifications service. The CI workflow pins Omarchy `v4.5.0`. When the
 shell contract changes, bump the tested reference deliberately rather than
 assuming compatibility.

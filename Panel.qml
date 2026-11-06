@@ -4,13 +4,13 @@ import qs.Commons as Commons
 import qs.Ui
 import "FocusModel.js" as FocusModel
 
-// Control panel for the shared Focus service. The layout follows the
+// Control panel for the shared Cadence service. The layout follows the
 // first-party panels: a PanelHero header, one large readout, a progress bar,
 // a separator, then the session picker and transport controls.
 Panel {
   id: root
-  moduleName: "jimmerioles.focus"
-  ipcTarget: "jimmerioles.focus"
+  moduleName: "jimmerioles.cadence"
+  ipcTarget: "jimmerioles.cadence"
   manageIpc: false
 
   property var service: null
@@ -62,7 +62,7 @@ Panel {
   readonly property string glyph: root.breakPhase ? "\u{f117c}" : "\u{f08c9}"
 
   readonly property string phaseLabel: !service
-    ? strings.t("widget.name", "Focus")
+    ? strings.t("widget.name", "Cadence")
     : root.breakPhase
       ? strings.t("panel.break", "Break")
       : (service.sessionMode === "deep"
@@ -76,7 +76,7 @@ Panel {
     return strings.t("panel.workMeta", "%1 minute work block").arg(minutes)
   }
   readonly property string heroMeta: !service
-    ? strings.t("panel.unavailable", "Focus service is still loading.")
+    ? strings.t("panel.unavailable", "Cadence service is still loading.")
     : root.phaseMeta
   readonly property string primaryLabel: !service
     ? strings.t("panel.start", "Start")

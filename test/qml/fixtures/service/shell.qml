@@ -9,10 +9,10 @@ import Quickshell.Io
 ShellRoot {
   id: root
 
-  readonly property string pluginDir: Quickshell.env("FOCUS_PLUGIN_DIR") || ""
-  readonly property string resultPath: Quickshell.env("FOCUS_TEST_RESULT") || ""
-  readonly property string commandLogPath: Quickshell.env("FOCUS_TEST_COMMAND_LOG") || ""
-  readonly property string notificationLogPath: Quickshell.env("FOCUS_TEST_NOTIFICATION_LOG") || ""
+  readonly property string pluginDir: Quickshell.env("CADENCE_PLUGIN_DIR") || ""
+  readonly property string resultPath: Quickshell.env("CADENCE_TEST_RESULT") || ""
+  readonly property string commandLogPath: Quickshell.env("CADENCE_TEST_COMMAND_LOG") || ""
+  readonly property string notificationLogPath: Quickshell.env("CADENCE_TEST_NOTIFICATION_LOG") || ""
 
   property var service: null
   property var failures: []
@@ -167,7 +167,7 @@ ShellRoot {
       if (!root.waitFor(root.service.phase === "break" && !root.service.running, 3000, "work block did not finish into a break")) return
       root.check(root.service.sessionsToday === 1, "completed work block is counted once")
       root.check(root.service.totalMs === 10 * 60000, "break uses the configured deep break")
-      root.check(!root.service.dndOwned, "Focus releases the DND it owned")
+      root.check(!root.service.dndOwned, "Cadence releases the DND it owned")
       if (!root.waitFor(root.fileContains(commandLog, "notifications showHistory"), 5000, "notification history was not replayed")) return
       if (!root.waitFor(root.fileContains(notificationLog, "Deep Focus complete"), 5000, "work completion notification did not arrive")) return
       root.service.skipBreak()

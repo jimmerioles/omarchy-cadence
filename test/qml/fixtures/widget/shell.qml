@@ -6,8 +6,8 @@ import Quickshell
 ShellRoot {
   id: root
 
-  readonly property string pluginDir: Quickshell.env("FOCUS_PLUGIN_DIR") || ""
-  readonly property string resultPath: Quickshell.env("FOCUS_TEST_RESULT") || ""
+  readonly property string pluginDir: Quickshell.env("CADENCE_PLUGIN_DIR") || ""
+  readonly property string resultPath: Quickshell.env("CADENCE_TEST_RESULT") || ""
 
   property var widget: null
   property var failures: []
@@ -108,7 +108,7 @@ ShellRoot {
       root.finish()
       return
     }
-    root.widget = component.createObject(host, { moduleName: "jimmerioles.focus", bar: fakeBar })
+    root.widget = component.createObject(host, { moduleName: "jimmerioles.cadence", bar: fakeBar })
     if (!root.widget) {
       root.fail("BarWidget.qml failed to instantiate: " + component.errorString())
       root.finish()

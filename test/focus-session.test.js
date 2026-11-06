@@ -30,7 +30,7 @@ test("start begins a fresh work session in the selected mode", () => {
   assert.deepEqual(result.effects, effects({ dnd: "query", save: true, stopHistoryReplay: true }))
 })
 
-test("start re-asserts DND when Focus already owns it", () => {
+test("start re-asserts DND when Cadence already owns it", () => {
   const result = Model.start(state({ dndOwned: true }), CONFIG, NOW)
   assert.deepEqual(result.effects, effects({ dnd: "on", save: true, stopHistoryReplay: true }))
 })
@@ -126,7 +126,7 @@ test("reset returns a work session to the queued mode and releases DND", () => {
   assert.deepEqual(result.effects, effects({ dnd: "off", save: true }))
 })
 
-test("reset leaves a user-owned DND alone when Focus never owned it", () => {
+test("reset leaves a user-owned DND alone when Cadence never owned it", () => {
   const result = Model.reset(state({ phase: "work", dndOwned: false }), CONFIG)
   assert.deepEqual(result.effects, effects({ save: true }))
 })

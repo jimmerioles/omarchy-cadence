@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "jimmerioles.focus",
-  "name": "Focus",
+  "id": "jimmerioles.cadence",
+  "name": "Cadence",
   "version": "1.0.0",
   "author": "Jim Merioles",
   "license": "MIT",
-  "description": "Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
+  "description": "Cadence: a Deep Focus (Ultradian) and Short Focus (Pomodoro) timer for the Omarchy bar that turns on Do Not Disturb and brings notifications back at the break.",
   "kinds": [
     "bar-widget",
     "service"
@@ -15,9 +15,18 @@
     "service": "Service.qml"
   },
   "barWidget": {
-    "displayName": "Focus",
-    "description": "Deep Focus and Short Focus sessions with automatic Do Not Disturb, breaks, and notification replay.",
+    "displayName": "Cadence",
+    "description": "Cadence adds Deep Focus and Short Focus sessions with automatic Do Not Disturb, breaks, and notification replay.",
     "category": "Time",
+    "aliases": [
+      "focus",
+      "focus timer",
+      "pomodoro",
+      "ultradian",
+      "deep work",
+      "do not disturb",
+      "dnd"
+    ],
     "allowMultiple": false,
     "defaultSection": "centerEnd",
     "defaults": {

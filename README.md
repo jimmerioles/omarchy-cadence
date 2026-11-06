@@ -18,7 +18,7 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 - Icon-only bar widget: a target while focusing, coffee during breaks, and pause when paused; hover it for the remaining time and state.
 - Panel with session type, progress, start/pause, and reset.
 - The session type is locked while a work block is running, so a stray click cannot change the current session.
-- Session buttons show their configured lengths (`Deep Focus · 90 min`, `Short Focus · 25 min`), so both options stay comparable while queueing the next block. Their tooltips name the Ultradian and Pomodoro methods and what each is best for.
+- Session buttons show their configured lengths (`Deep Focus · 90 min`, `Short Focus · 25 min`), so both options stay comparable while queueing the next block. Their tooltips name the Ultradian and Pomodoro methods and what each is best for, and appear on both hover and keyboard focus.
 - While a session is active, the session-type header shows the upcoming sequence on its right: the break and next focus type during work, or just the next focus type during a break.
 - Skip a break from the panel to start the next focus block early.
 - Automatic breaks (configurable) and desktop notifications when a phase ends.

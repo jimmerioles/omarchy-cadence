@@ -129,6 +129,7 @@ Panel {
   // Keyboard cursor shared by the mouse and the panel key catcher, following
   // the first-party panel pattern: one row of choices, one row of transport.
   property bool cursorActive: false
+  property bool keyboardCursor: false
   property string focusSection: "transport"
   property int modeIndex: 0
   property int transportIndex: 0
@@ -139,6 +140,7 @@ Panel {
 
   function resetCursor() {
     cursorActive = false
+    keyboardCursor = false
     focusSection = "transport"
     transportIndex = 0
     modeIndex = modeIndexFor(service ? service.mode : "deep")
@@ -146,17 +148,20 @@ Panel {
 
   function pointAtMode(index) {
     cursorActive = true
+    keyboardCursor = false
     focusSection = "mode"
     modeIndex = Math.max(0, Math.min(1, index))
   }
 
   function pointAtTransport(index) {
     cursorActive = true
+    keyboardCursor = false
     focusSection = "transport"
     transportIndex = Math.max(0, Math.min(1, index))
   }
 
   function moveCursor(dx, dy) {
+    keyboardCursor = true
     if (!cursorActive) {
       cursorActive = true
       return
@@ -173,6 +178,7 @@ Panel {
 
   function activateCursor() {
     cursorActive = true
+    keyboardCursor = true
     if (focusSection === "mode") {
       if (root.modeLocked) return
       var option = modeOptions[modeIndex]
@@ -352,7 +358,6 @@ Panel {
                 required property int index
                 width: (modeRow.width - modeRow.spacing) / 2
                 text: modelData.label
-                tooltipText: modelData.tooltip
                 active: root.service
                   ? root.service.mode === modelData.value
                   : modelData.value === "deep"
@@ -367,6 +372,14 @@ Panel {
                 verticalPadding: Style.spacing.controlPaddingY + Style.space(2)
                 onClicked: root.selectMode(modelData.value)
                 onHovered: function(hovered) { if (hovered) root.pointAtMode(index) }
+
+                PanelToolTip {
+                  visible: root.cursorActive && root.focusSection === "mode" && root.modeIndex === index
+                  delay: root.keyboardCursor ? 0 : 400
+                  text: modelData.tooltip
+                  fontFamily: root.contentFontFamily
+                  implicitWidth: Math.min(implicitContentWidth + leftPadding + rightPadding, Style.space(320))
+                }
               }
             }
           }

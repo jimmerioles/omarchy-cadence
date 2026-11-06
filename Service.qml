@@ -43,6 +43,7 @@ Item {
   property string phase: "work"         // "work" | "break"
   property bool running: false
   property bool paused: false
+  property bool dndOwned: false
   property double endsAt: 0             // epoch ms; only meaningful while running
   property double remainingMs: 90 * 60000
   property double totalMs: 90 * 60000
@@ -146,6 +147,10 @@ Item {
     nowMs = now
     running = true
     paused = false
+    if (phase === "work") {
+      historyReplayTimer.stop()
+      refreshFocusDnd()
+    }
     dirty = true
     saveSoon()
   }
@@ -173,6 +178,7 @@ Item {
   }
 
   function reset() {
+    if (phase === "work") endFocusDnd(false)
     running = false
     paused = false
     endsAt = 0
@@ -261,6 +267,7 @@ Item {
     remainingMs = 0
 
     if (phase === "work") {
+      endFocusDnd(true)
       ensureToday()
       sessionsToday += 1
       phase = "break"
@@ -285,6 +292,7 @@ Item {
   // user sees the next phase ready rather than a stale notification at login.
   function finishPast() {
     if (phase === "work") {
+      endFocusDnd(false)
       ensureToday()
       sessionsToday += 1
       phase = "break"
@@ -305,6 +313,56 @@ Item {
     if (sessionsDate !== key) {
       sessionsDate = key
       sessionsToday = 0
+    }
+  }
+
+  // ---- Do Not Disturb ---------------------------------------------------
+  // Focus only turns DND off again when it was the one that turned it on.
+  // A DND the user set themselves is left alone.
+  function refreshFocusDnd() {
+    if (phase !== "work" || !running) return
+    if (dndOwned) {
+      Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
+      return
+    }
+    if (!dndQuery.running) dndQuery.running = true
+  }
+
+  function applyDndQuery(raw) {
+    if (phase !== "work" || !running) return
+    var state = String(raw || "").trim().toLowerCase()
+    if (state === "on") {
+      dndOwned = false
+      return
+    }
+    if (state !== "off") return
+    dndOwned = true
+    dirty = true
+    saveSoon()
+    Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
+  }
+
+  function endFocusDnd(replayHistory) {
+    if (!dndOwned) return
+    dndOwned = false
+    dirty = true
+    saveSoon()
+    Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
+    if (replayHistory) historyReplayTimer.restart()
+  }
+
+  function syncFocusDndAfterLoad() {
+    if (dndOwned) {
+      if (running && phase === "work") {
+        Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
+      } else {
+        dndOwned = false
+        dirty = true
+        saveSoon()
+        Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
+      }
+    } else if (running && phase === "work") {
+      refreshFocusDnd()
     }
   }
 
@@ -387,6 +445,7 @@ Item {
     mode = parsed.mode
     sessionMode = parsed.sessionMode
     phase = parsed.phase
+    dndOwned = parsed.dndOwned === true
     sessionsToday = parsed.sessionsToday
     sessionsDate = parsed.sessionsDate
     ensureToday()
@@ -428,6 +487,7 @@ Item {
       }
     }
 
+    syncFocusDndAfterLoad()
     dirty = true
     saveSoon()
   }
@@ -448,6 +508,7 @@ Item {
       phase: phase,
       running: running,
       paused: paused,
+      dndOwned: dndOwned,
       endsAt: running ? Math.round(endsAt) : 0,
       remainingMs: Math.round(effectiveRemainingMs),
       totalMs: Math.round(totalMs),
@@ -487,6 +548,22 @@ Item {
   }
 
   Process {
+    id: dndQuery
+    running: false
+    command: ["omarchy-shell", "notifications", "isDnd"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: service.applyDndQuery(text)
+    }
+  }
+
+  Timer {
+    id: historyReplayTimer
+    interval: 800
+    onTriggered: Util.execArgv(["omarchy-shell", "notifications", "showHistory"])
+  }
+
+  Process {
     id: prepareStore
     command: ["bash", "-c",
       "umask 077\n" +
@@ -514,5 +591,8 @@ Item {
     if (storeReady && stateLoaded && dirty) saveSoon()
   }
 
-  Component.onDestruction: saveNow()
+  Component.onDestruction: {
+    if (dndOwned) Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
+    saveNow()
+  }
 }

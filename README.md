@@ -22,6 +22,8 @@ The timer lives in a shared Omarchy shell service, so every monitor shows the sa
 - While a session is active, the session-type header shows the upcoming sequence on its right: the break and next focus type during work, or just the next focus type during a break.
 - Skip a break from the panel to start the next focus block early.
 - Automatic breaks (configurable) and desktop notifications when a phase ends.
+- Silences desktop notifications while a work block is active, then restores DND and replays Omarchy's notification history when the break begins.
+- Leaves a Do Not Disturb setting you enabled yourself untouched.
 - Notifications can open the panel, and start a ready break or focus block.
 - Completed sessions counted for the day.
 - Keyboard navigation in the panel: arrow keys or `j`/`k` move between rows, `h`/`l` move between buttons, `Enter`/`Space` activate, and `Escape` closes.
@@ -77,6 +79,8 @@ omarchy-shell jimmerioles.focus close
 `status` returns JSON with the current mode, phase, remaining milliseconds, progress, and today's completed session count.
 
 Notifications can be clicked to open the panel. When a break or work block is ready rather than auto-started, the notification also offers a button to start it.
+
+While a work block is active, Focus enables Do Not Disturb. At the break it restores the previous DND state and uses Omarchy's existing notification history replay for review.
 
 ## Keybindings
 

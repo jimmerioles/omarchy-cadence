@@ -100,13 +100,13 @@ Panel {
       value: "deep",
       label: strings.t("panel.ultradianChip", "Deep Focus · %1 min")
         .arg(numberText(service ? service.deepMinutes : 90)),
-      tooltip: strings.t("panel.ultradianHint", "Ultradian · best for coding, writing, studying")
+      tooltip: strings.t("panel.ultradianHint", "Ultradian · best for deep, uninterrupted work — coding, writing, studying")
     },
     {
       value: "pomodoro",
       label: strings.t("panel.pomodoroChip", "Short Focus · %1 min")
         .arg(numberText(service ? service.pomodoroMinutes : 25)),
-      tooltip: strings.t("panel.pomodoroHint", "Pomodoro · best for email, admin, quick tasks")
+      tooltip: strings.t("panel.pomodoroHint", "Pomodoro · best for quick tasks and admin work — email, errands, chores")
     }
   ]
 

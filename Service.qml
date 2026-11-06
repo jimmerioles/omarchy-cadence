@@ -8,6 +8,9 @@ import "FocusModel.js" as FocusModel
 // Shared focus-timer state. One instance serves every bar surface, so the
 // countdown, mode, and session count stay identical on all monitors and across
 // bar reloads. The bar widget only renders this and forwards clicks.
+//
+// The session rules live in FocusModel.js. This file owns the QML properties,
+// timers, disk I/O, notifications, and the side effects those rules return.
 Item {
   id: service
 
@@ -24,15 +27,15 @@ Item {
   }
 
   // ---- Settings ---------------------------------------------------------
-  // Defaults mirror manifest.json's barWidget.defaults. The bar widget feeds
-  // these from its shell.json entry whenever the user changes them.
-  property int deepMinutes: 90
-  property int pomodoroMinutes: 25
-  property int deepBreakMinutes: 20
-  property int shortBreakMinutes: 5
-  property bool autoStartBreak: true
-  property bool autoStartWork: false
-  property bool notifications: true
+  // Defaults come from FocusModel so the manifest contract test can compare
+  // both against the schema instead of keeping a third copy in QML.
+  property int deepMinutes: FocusModel.defaultConfig().deepMinutes
+  property int pomodoroMinutes: FocusModel.defaultConfig().pomodoroMinutes
+  property int deepBreakMinutes: FocusModel.defaultConfig().deepBreakMinutes
+  property int shortBreakMinutes: FocusModel.defaultConfig().shortBreakMinutes
+  property bool autoStartBreak: FocusModel.defaultConfig().autoStartBreak
+  property bool autoStartWork: FocusModel.defaultConfig().autoStartWork
+  property bool notifications: FocusModel.defaultConfig().notifications
 
   // ---- Session ----------------------------------------------------------
   // mode is the work type chosen for the next session; sessionMode is the
@@ -45,8 +48,8 @@ Item {
   property bool paused: false
   property bool dndOwned: false
   property double endsAt: 0             // epoch ms; only meaningful while running
-  property double remainingMs: 90 * 60000
-  property double totalMs: 90 * 60000
+  property double remainingMs: FocusModel.defaultConfig().deepMinutes * 60000
+  property double totalMs: FocusModel.defaultConfig().deepMinutes * 60000
   property double nowMs: Date.now()
   property int sessionsToday: 0
   property string sessionsDate: ""
@@ -70,106 +73,105 @@ Item {
     ? strings.t("panel.running", "Running")
     : (paused ? strings.t("panel.paused", "Paused") : strings.t("panel.ready", "Ready"))
 
-  // ---- Configuration ----------------------------------------------------
-  function boolValue(value, fallback) {
-    if (value === undefined || value === null) return fallback
-    if (typeof value === "boolean") return value
-    var text = String(value).toLowerCase()
-    if (text === "true" || text === "1" || text === "on" || text === "yes") return true
-    if (text === "false" || text === "0" || text === "off" || text === "no") return false
-    return fallback
+  // ---- State projection -------------------------------------------------
+  function configSnapshot() {
+    return {
+      deepMinutes: deepMinutes,
+      pomodoroMinutes: pomodoroMinutes,
+      deepBreakMinutes: deepBreakMinutes,
+      shortBreakMinutes: shortBreakMinutes,
+      autoStartBreak: autoStartBreak,
+      autoStartWork: autoStartWork,
+      notifications: notifications
+    }
   }
 
-  function configure(values) {
-    var v = values || {}
-    var nextDeep = FocusModel.clampInt(v.deepMinutes, deepMinutes, 15, 180)
-    var nextPomodoro = FocusModel.clampInt(v.pomodoroMinutes, pomodoroMinutes, 5, 60)
-    var nextDeepBreak = FocusModel.clampInt(v.deepBreakMinutes, deepBreakMinutes, 5, 45)
-    var nextShortBreak = FocusModel.clampInt(v.shortBreakMinutes, shortBreakMinutes, 1, 15)
-    var nextAutoBreak = boolValue(v.autoStartBreak, autoStartBreak)
-    var nextAutoWork = boolValue(v.autoStartWork, autoStartWork)
-    var nextNotifications = boolValue(v.notifications, notifications)
+  function stateSnapshot() {
+    return {
+      mode: mode,
+      sessionMode: sessionMode,
+      phase: phase,
+      running: running,
+      paused: paused,
+      dndOwned: dndOwned,
+      endsAt: endsAt,
+      remainingMs: remainingMs,
+      totalMs: totalMs,
+      sessionsToday: sessionsToday,
+      sessionsDate: sessionsDate
+    }
+  }
 
-    var changed = nextDeep !== deepMinutes
-      || nextPomodoro !== pomodoroMinutes
-      || nextDeepBreak !== deepBreakMinutes
-      || nextShortBreak !== shortBreakMinutes
-      || nextAutoBreak !== autoStartBreak
-      || nextAutoWork !== autoStartWork
-      || nextNotifications !== notifications
-    if (!changed) return
+  // Apply a pure transition and run the effects it asked for.
+  function applyResult(result, now) {
+    if (!result || !result.state) return
 
-    deepMinutes = nextDeep
-    pomodoroMinutes = nextPomodoro
-    deepBreakMinutes = nextDeepBreak
-    shortBreakMinutes = nextShortBreak
-    autoStartBreak = nextAutoBreak
-    autoStartWork = nextAutoWork
-    notifications = nextNotifications
+    var next = result.state
+    var effects = result.effects || {}
 
-    // A session that has not started yet follows its new length. A running or
-    // paused session keeps the length it began with.
-    if (stateLoaded && !running && !paused) {
-      if (phase === "work") sessionMode = mode
-      totalMs = durationFor(phase)
-      remainingMs = totalMs
+    mode = next.mode
+    sessionMode = next.sessionMode
+    phase = next.phase
+    running = next.running
+    paused = next.paused
+    dndOwned = next.dndOwned
+    endsAt = next.endsAt
+    remainingMs = next.remainingMs
+    totalMs = next.totalMs
+    sessionsToday = next.sessionsToday
+    sessionsDate = next.sessionsDate
+    if (now !== undefined) nowMs = now
+
+    if (effects.stopHistoryReplay) historyReplayTimer.stop()
+
+    if (effects.dnd === "query") {
+      refreshFocusDnd()
+    } else if (effects.dnd === "on") {
+      Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
+    } else if (effects.dnd === "off") {
+      Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
+      if (effects.replayHistory) historyReplayTimer.restart()
+    }
+
+    if (effects.notify === "workDone") notifyWorkDone()
+    else if (effects.notify === "breakDone") notifyBreakDone()
+
+    if (effects.save) {
       dirty = true
       saveSoon()
     }
   }
 
-  function durationFor(kind) {
-    var minutes = kind === "break" ? breakMinutes : workMinutes
-    return Math.max(60000, minutes * 60000)
+  // ---- Configuration ----------------------------------------------------
+  function configure(values) {
+    var resolved = FocusModel.resolveConfig(configSnapshot(), values)
+    if (!resolved.changed) return
+
+    var next = resolved.config
+    deepMinutes = next.deepMinutes
+    pomodoroMinutes = next.pomodoroMinutes
+    deepBreakMinutes = next.deepBreakMinutes
+    shortBreakMinutes = next.shortBreakMinutes
+    autoStartBreak = next.autoStartBreak
+    autoStartWork = next.autoStartWork
+    notifications = next.notifications
+
+    // A session that has not started yet follows its new length. A running or
+    // paused session keeps the length it began with.
+    if (stateLoaded && !running && !paused) {
+      applyResult(FocusModel.applyConfigToState(stateSnapshot(), next), Date.now())
+    }
   }
 
   // ---- Timer control ----------------------------------------------------
   function start() {
-    if (running) return
-    ensureToday()
-
-    // Starting a fresh work block adopts the queued mode. Resuming a paused
-    // session keeps the mode it was already using.
-    if (phase === "work" && !paused) {
-      sessionMode = mode
-      totalMs = durationFor("work")
-      remainingMs = totalMs
-    }
-
-    if (totalMs <= 0 || remainingMs <= 0 || remainingMs > totalMs + 1000) {
-      totalMs = durationFor(phase)
-      remainingMs = totalMs
-    }
-    if (remainingMs <= 0) return
-
     var now = Date.now()
-    endsAt = now + remainingMs
-    nowMs = now
-    running = true
-    paused = false
-    if (phase === "work") {
-      historyReplayTimer.stop()
-      refreshFocusDnd()
-    }
-    dirty = true
-    saveSoon()
+    applyResult(FocusModel.start(stateSnapshot(), configSnapshot(), now), now)
   }
 
   function pause() {
-    if (!running) return
     var now = Date.now()
-    var left = Math.max(0, endsAt - now)
-    nowMs = now
-    if (left <= 0) {
-      finishPhase()
-      return
-    }
-    remainingMs = left
-    running = false
-    paused = true
-    endsAt = 0
-    dirty = true
-    saveSoon()
+    applyResult(FocusModel.pause(stateSnapshot(), configSnapshot(), now), now)
   }
 
   function toggle() {
@@ -178,142 +180,40 @@ Item {
   }
 
   function reset() {
-    if (phase === "work") endFocusDnd(false)
-    running = false
-    paused = false
-    endsAt = 0
-    nowMs = Date.now()
-    if (phase === "work") sessionMode = mode
-    totalMs = durationFor(phase)
-    remainingMs = totalMs
-    dirty = true
-    saveSoon()
+    var now = Date.now()
+    applyResult(FocusModel.reset(stateSnapshot(), configSnapshot()), now)
   }
 
   function skipBreak() {
-    if (phase !== "break") return
-    running = false
-    paused = false
-    endsAt = 0
-    nowMs = Date.now()
-    phase = "work"
-    sessionMode = mode
-    totalMs = durationFor("work")
-    remainingMs = totalMs
-    dirty = true
-    saveSoon()
+    var now = Date.now()
+    applyResult(FocusModel.skipBreak(stateSnapshot(), configSnapshot()), now)
   }
 
   function selectMode(next) {
-    if (next !== "deep" && next !== "pomodoro") return
-
-    // While a session is running, paused, or on a break, a new mode is queued
-    // for the next work block instead of throwing the current one away.
-    if (next === mode) {
-      if (phase === "work" && !running && !paused && sessionMode !== mode) {
-        sessionMode = mode
-        totalMs = durationFor("work")
-        remainingMs = totalMs
-        dirty = true
-        saveSoon()
-      }
-      return
-    }
-
-    mode = next
-    if (phase === "work" && !running && !paused) {
-      sessionMode = mode
-      totalMs = durationFor("work")
-      remainingMs = totalMs
-    }
-    dirty = true
-    saveSoon()
+    var now = Date.now()
+    applyResult(FocusModel.selectMode(stateSnapshot(), configSnapshot(), next), now)
   }
 
   // Start a fresh work block in the given mode. If a work session is already
   // running or paused, queue the mode instead so a shortcut cannot destroy
   // progress. A break gives way to the requested work block.
   function startMode(value) {
-    if (value !== "deep" && value !== "pomodoro") return
-    if (phase === "work" && (running || paused)) {
-      selectMode(value)
-      return
-    }
-
-    mode = value
-    phase = "work"
-    sessionMode = value
-    running = false
-    paused = false
-    endsAt = 0
-    nowMs = Date.now()
-    totalMs = durationFor("work")
-    remainingMs = totalMs
-    start()
+    var now = Date.now()
+    applyResult(FocusModel.startMode(stateSnapshot(), configSnapshot(), value, now), now)
   }
 
   function tick() {
-    nowMs = Date.now()
-    if (running && endsAt <= nowMs) finishPhase()
+    var now = Date.now()
+    nowMs = now
+    var result = FocusModel.tick(stateSnapshot(), configSnapshot(), now)
+    if (result.effects.save) applyResult(result, now)
   }
 
+  // Kept for the panel tests and for a caller that wants to end a session
+  // explicitly; the ticker normally reaches this through tick().
   function finishPhase() {
-    if (!running) return
-
-    nowMs = Date.now()
-    running = false
-    paused = false
-    endsAt = 0
-    remainingMs = 0
-
-    if (phase === "work") {
-      endFocusDnd(true)
-      ensureToday()
-      sessionsToday += 1
-      phase = "break"
-      totalMs = durationFor("break")
-      remainingMs = totalMs
-      notifyWorkDone()
-      if (autoStartBreak) start()
-    } else {
-      phase = "work"
-      sessionMode = mode
-      totalMs = durationFor("work")
-      remainingMs = totalMs
-      notifyBreakDone()
-      if (autoStartWork) start()
-    }
-
-    dirty = true
-    saveSoon()
-  }
-
-  // A session that ended while the shell was down is completed silently: the
-  // user sees the next phase ready rather than a stale notification at login.
-  function finishPast() {
-    if (phase === "work") {
-      endFocusDnd(false)
-      ensureToday()
-      sessionsToday += 1
-      phase = "break"
-    } else {
-      phase = "work"
-      sessionMode = mode
-    }
-    running = false
-    paused = false
-    endsAt = 0
-    totalMs = durationFor(phase)
-    remainingMs = totalMs
-    dirty = true
-  }
-
-  function ensureToday() {
-    var key = FocusModel.dateKey(new Date())
-    if (sessionsDate !== key) {
-      sessionsDate = key
-      sessionsToday = 0
-    }
+    var now = Date.now()
+    applyResult(FocusModel.finishPhase(stateSnapshot(), configSnapshot(), now), now)
   }
 
   // ---- Do Not Disturb ---------------------------------------------------
@@ -329,41 +229,8 @@ Item {
   }
 
   function applyDndQuery(raw) {
-    if (phase !== "work" || !running) return
-    var state = String(raw || "").trim().toLowerCase()
-    if (state === "on") {
-      dndOwned = false
-      return
-    }
-    if (state !== "off") return
-    dndOwned = true
-    dirty = true
-    saveSoon()
-    Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
-  }
-
-  function endFocusDnd(replayHistory) {
-    if (!dndOwned) return
-    dndOwned = false
-    dirty = true
-    saveSoon()
-    Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
-    if (replayHistory) historyReplayTimer.restart()
-  }
-
-  function syncFocusDndAfterLoad() {
-    if (dndOwned) {
-      if (phase === "work" && (running || paused)) {
-        Util.execArgv(["omarchy-shell", "notifications", "setDnd", "true"])
-      } else {
-        dndOwned = false
-        dirty = true
-        saveSoon()
-        Util.execArgv(["omarchy-shell", "notifications", "setDnd", "false"])
-      }
-    } else if (running && phase === "work") {
-      refreshFocusDnd()
-    }
+    var now = Date.now()
+    applyResult(FocusModel.applyDndQuery(stateSnapshot(), raw), now)
   }
 
   // ---- Notifications ----------------------------------------------------
@@ -418,18 +285,6 @@ Item {
   }
 
   // ---- Persistence ------------------------------------------------------
-  function resetForLoad() {
-    running = false
-    paused = false
-    endsAt = 0
-    nowMs = Date.now()
-    phase = "work"
-    sessionMode = mode
-    totalMs = durationFor("work")
-    remainingMs = totalMs
-    ensureToday()
-  }
-
   function loadState(raw) {
     if (stateLoaded) return
     stateLoaded = true
@@ -440,62 +295,8 @@ Item {
       return
     }
 
-    var parsed = FocusModel.parseState(raw)
-    if (!parsed) {
-      resetForLoad()
-      dirty = true
-      saveSoon()
-      return
-    }
-
-    mode = parsed.mode
-    sessionMode = parsed.sessionMode
-    phase = parsed.phase
-    dndOwned = parsed.dndOwned === true
-    sessionsToday = parsed.sessionsToday
-    sessionsDate = parsed.sessionsDate
-    ensureToday()
-
     var now = Date.now()
-    nowMs = now
-    var storedTotal = parsed.totalMs > 0 ? parsed.totalMs : durationFor(phase)
-    totalMs = Math.max(60000, Math.min(storedTotal, 12 * 60 * 60 * 1000))
-
-    if (parsed.running && parsed.endsAt > now) {
-      var left = Math.max(0, parsed.endsAt - now)
-      if (left > totalMs) totalMs = Math.min(left, 12 * 60 * 60 * 1000)
-      remainingMs = Math.min(left, totalMs)
-      endsAt = now + remainingMs
-      running = true
-      paused = false
-    } else if (parsed.running) {
-      finishPast()
-    } else {
-      running = false
-      paused = parsed.paused === true
-      endsAt = 0
-      remainingMs = parsed.remainingMs > 0 ? parsed.remainingMs : totalMs
-      remainingMs = Math.min(remainingMs, totalMs)
-
-      // Previously idle or ready to begin: adopt the current configured
-      // durations, which may have changed since the state was written. A
-      // paused session keeps its remaining time.
-      if (!paused && remainingMs >= totalMs - 500) {
-        if (phase === "work") sessionMode = mode
-        totalMs = durationFor(phase)
-        remainingMs = totalMs
-      }
-      if (remainingMs <= 0) {
-        paused = false
-        if (phase === "work") sessionMode = mode
-        totalMs = durationFor(phase)
-        remainingMs = totalMs
-      }
-    }
-
-    syncFocusDndAfterLoad()
-    dirty = true
-    saveSoon()
+    applyResult(FocusModel.resolveLoadedState(FocusModel.parseState(raw), configSnapshot(), now), now)
   }
 
   function saveSoon() {
@@ -507,36 +308,12 @@ Item {
   function saveNow() {
     saveTimer.stop()
     if (!stateLoaded || !storeReady) return
-    stateFile.setText(JSON.stringify({
-      version: 1,
-      mode: mode,
-      sessionMode: sessionMode,
-      phase: phase,
-      running: running,
-      paused: paused,
-      dndOwned: dndOwned,
-      endsAt: running ? Math.round(endsAt) : 0,
-      remainingMs: Math.round(effectiveRemainingMs),
-      totalMs: Math.round(totalMs),
-      sessionsToday: sessionsToday,
-      sessionsDate: sessionsDate
-    }))
+    stateFile.setText(JSON.stringify(FocusModel.serializeState(stateSnapshot(), Date.now())))
     dirty = false
   }
 
   function status() {
-    return JSON.stringify({
-      mode: mode,
-      sessionMode: sessionMode,
-      phase: phase,
-      running: running,
-      paused: paused,
-      remainingMs: Math.round(effectiveRemainingMs),
-      totalMs: Math.round(totalMs),
-      progress: Math.round(progress * 100),
-      sessionsToday: sessionsToday,
-      label: phaseLabel
-    })
+    return JSON.stringify(FocusModel.statusSnapshot(stateSnapshot(), Date.now(), phaseLabel))
   }
 
   Timer {
@@ -571,14 +348,7 @@ Item {
 
   Process {
     id: prepareStore
-    command: ["bash", "-c",
-      "umask 077\n" +
-      "dir=$1\n" +
-      "file=$2\n" +
-      "mkdir -p -- \"$dir\" && chmod 700 -- \"$dir\" || exit 1\n" +
-      "if [[ -L $file ]]; then rm -f -- \"$file\"; fi\n" +
-      "if [[ -f $file ]]; then chmod 600 -- \"$file\"; elif [[ ! -e $file ]]; then : >\"$file\"; fi\n",
-      "omarchy-focus", service.stateDir, service.statePath]
+    command: FocusModel.prepareStoreCommand(service.stateDir, service.statePath)
     running: true
     onExited: function(code) { service.storeReady = code === 0 }
   }

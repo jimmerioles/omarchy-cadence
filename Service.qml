@@ -375,9 +375,9 @@ Item {
   function notifyWorkDone() {
     if (!notifications) return
     var minutes = Commons.I18n.formatNumber(breakMinutes, 0)
-    var title = sessionMode === "deep"
-      ? strings.t("notify.deepDone", "Deep work complete")
-      : strings.t("notify.pomodoroDone", "Pomodoro complete")
+    var title = (sessionMode === "deep"
+      ? strings.t("notify.deepDone", "Deep Focus complete · %1")
+      : strings.t("notify.pomodoroDone", "Short Focus complete · %1")).arg(completionTime())
     var body = autoStartBreak
       ? strings.t("notify.breakStarted", "A %1 minute break has started. Step away.").arg(minutes)
       : strings.t("notify.breakReady", "A %1 minute break is ready. Start it when you are.").arg(minutes)

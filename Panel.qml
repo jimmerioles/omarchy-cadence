@@ -98,15 +98,15 @@ Panel {
   readonly property var modeOptions: [
     {
       value: "deep",
-      label: strings.t("panel.ultradian", "Ultradian"),
-      tooltip: strings.t("panel.ultradianHint", "%1 minute deep focus block")
-        .arg(numberText(service ? service.deepMinutes : 90))
+      label: strings.t("panel.ultradianChip", "Ultradian · %1 min")
+        .arg(numberText(service ? service.deepMinutes : 90)),
+      tooltip: strings.t("panel.ultradianHint", "Deep Focus")
     },
     {
       value: "pomodoro",
-      label: strings.t("panel.pomodoro", "Pomodoro"),
-      tooltip: strings.t("panel.pomodoroHint", "%1 minute short focus block")
-        .arg(numberText(service ? service.pomodoroMinutes : 25))
+      label: strings.t("panel.pomodoroChip", "Pomodoro · %1 min")
+        .arg(numberText(service ? service.pomodoroMinutes : 25)),
+      tooltip: strings.t("panel.pomodoroHint", "Short Focus")
     }
   ]
 

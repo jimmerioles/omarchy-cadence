@@ -53,13 +53,13 @@ Valid sections are `left`, `centerBegin`, `center`, `centerEnd`, `tray`, and
 Add to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + C", "Cadence", { panel = "jimmerioles.cadence" })
 ```
 
-To replace the stock **Toggle full screen desktop** binding:
+To start or pause the current block without opening the panel:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + P", "Cadence start/pause", "omarchy-shell jimmerioles.cadence toggleTimer")
 ```
 
 Apply and validate:

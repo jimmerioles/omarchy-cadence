@@ -173,7 +173,7 @@ test validates relative links, settings/defaults/ranges, IPC methods, the
 2. Update `ROADMAP.md` so the current release matches the manifest and the next
    release is accurate. Update the README's pillar status table if a wedge moved.
 3. Update the README, reference, or usage guide for any behavior change.
-4. Recapture `assets/focus-demo.gif` and `preview.png` if the panel or bar
+4. Recapture `assets/cadence-demo.gif` and `preview.png` if the panel or bar
    changed visibly.
 5. Run the full checklist:
 

@@ -8,7 +8,7 @@ Cadence is a focused workday system for the [Omarchy](https://omarchy.org/) bar:
 [![Omarchy 4.5+](https://img.shields.io/badge/Omarchy-4.5%2B-5b8def)](https://omarchy.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3da639)](LICENSE)
 
-![Demo: a notification arrives, focus starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/focus-demo.gif)
+![Cadence demo: a notification arrives, Cadence starts with Do Not Disturb on, a notification stays quiet, and notifications return after focus](assets/cadence-demo.gif)
 
 The demo shows the first wedge: **Focus + Attention**.
 
@@ -104,13 +104,13 @@ The panel shows the current phase, countdown, progress, and today's completed fo
 Add this binding to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + C", "Cadence", { panel = "jimmerioles.cadence" })
 ```
 
-`SUPER + ALT + O` is free in stock Omarchy. If you prefer `SUPER + CTRL + ALT + F`, use `o.rebind`; it replaces the stock **Toggle full screen desktop** binding:
+`SUPER + ALT + C` is free in stock Omarchy and opens the Cadence panel. If you want to start or pause the current block without opening the panel:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + P", "Cadence start/pause", "omarchy-shell jimmerioles.cadence toggleTimer")
 ```
 
 Hyprland reloads Lua bindings on save. To apply and validate manually:

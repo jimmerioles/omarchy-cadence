@@ -110,14 +110,14 @@ ready break yourself.
 Add a binding to `~/.config/hypr/bindings.lua`:
 
 ```lua
-o.bind("SUPER + ALT + O", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + C", "Cadence", { panel = "jimmerioles.cadence" })
 ```
 
-`SUPER + ALT + O` is free in stock Omarchy. To use `SUPER + CTRL + ALT + F`
-instead, replace the stock **Toggle full screen desktop** binding:
+`SUPER + ALT + C` is free in stock Omarchy and opens the Cadence panel. To
+start or pause the timer without opening the panel:
 
 ```lua
-o.rebind("SUPER + CTRL + ALT + F", "Cadence timer", { panel = "jimmerioles.cadence" })
+o.bind("SUPER + ALT + P", "Cadence start/pause", "omarchy-shell jimmerioles.cadence toggleTimer")
 ```
 
 Hyprland reloads Lua bindings on save. To apply and validate manually:

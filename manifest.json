@@ -28,7 +28,7 @@
       "dnd"
     ],
     "allowMultiple": false,
-    "defaultSection": "centerEnd",
+    "defaultSection": "center",
     "defaults": {
       "deepMinutes": 90,
       "shortMinutes": 25,

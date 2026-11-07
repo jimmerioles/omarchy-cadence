@@ -33,8 +33,8 @@ is the first: the Focus + Attention core. The installer and
 
 `omarchy plugin add --enable` validates the manifest, clones the repository into
 `~/.config/omarchy/plugins/jimmerioles.cadence`, and, when run interactively, asks
-where to place the widget. The manifest default is `centerEnd`, the right edge
-of the center group.
+where to place the widget. Omarchy places it at the right edge of the center
+group (`centerEnd`) by default.
 
 ### Placement
 
